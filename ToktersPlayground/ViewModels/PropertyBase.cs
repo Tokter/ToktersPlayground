@@ -12,15 +12,22 @@ namespace ToktersPlayground.ViewModels
 {
     public class PropertyBase : ViewModelBase, INotifyDataErrorInfo
     {
-        public string? Name { get; set; }
-        public PropertyInfo? Property { get; set; }
-        public object? Item { get; set; }
-
+        private PropertyEditorViewModel _propertyEditor;
+        private PropertyDetail _details;
         private Dictionary<string, string> _errors = new Dictionary<string, string>();
 
+        public string? Name { get; set; }
         public bool HasErrors => _errors.Count > 0;
+        public PropertyEditorViewModel Editor => _propertyEditor;
+        public PropertyDetail Details => _details;
 
         public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
+
+        public PropertyBase(PropertyEditorViewModel propertyEditor, PropertyDetail details)
+        {
+            _propertyEditor = propertyEditor;
+            _details = details;
+        }
 
         public IEnumerable GetErrors(string? propertyName)
         {

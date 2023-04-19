@@ -10,7 +10,7 @@ namespace ToktersPlayground.Components.ParagliderWingSimulation.Commands
     /// <summary>
     /// Create a new paraglider wing simulation component
     /// </summary>
-    [PlaygroundCommand("Components/Paragliding/Wing Simulation", PlaygroundCommandLocation.ComponentsMenu)]
+    [PlaygroundCommand("Add Component/Paragliding/Wing Simulation", PlaygroundCommandLocation.ComponentsMenu)]
     public class New : PlaygroundCommand
     {
         public override void Execute(IPlayground playgound)

@@ -11,15 +11,16 @@ namespace ToktersPlayground.ViewModels
     {
         public string StringFormat { get; set; } = string.Empty;
 
+        public PropertyFloatViewModel(PropertyEditorViewModel propertyEditor, PropertyDetail details) : base(propertyEditor, details)
+        {
+        }
+
         public float Value
         {
-            get
-            {
-                return (float?)Property?.GetValue(Item) ?? 0.0f;
-            }
+            get => (float)Editor.GetValue(Details, 0.0f);
             set
             {
-                Property?.SetValue(Item, value);
+                Editor.SetValue(Details, value);
                 this.RaisePropertyChanged();
             }
         }

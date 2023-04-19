@@ -26,6 +26,7 @@ namespace ToktersPlayground.ViewModels
         public IList<MenuViewModel>? ComponentTools { get; set; }
         public ObservableCollection<IPlaygoundComponent> Components { get; set; } = new ObservableCollection<IPlaygoundComponent>();
         public ObservableCollection<PropertyBase> Properties { get; set; } = new ObservableCollection<PropertyBase>();
+        public PropertyEditorViewModel PropertyEditor { get; set; } = new PropertyEditorViewModel();
 
         public MainWindowViewModel()
         {
@@ -43,7 +44,7 @@ namespace ToktersPlayground.ViewModels
                 this.RaiseAndSetIfChanged(ref _selectedComponent, value);
                 this.RaisePropertyChanged(nameof(ComponentViewModel));
                 RefreshCommands();
-                BuildPropertyList();
+                PropertyEditor.SelectObject(_selectedComponent);
             }
         }
 
@@ -124,40 +125,5 @@ namespace ToktersPlayground.ViewModels
                 item.TriggerRefresh();
             }
         }
-
-        private void BuildPropertyList()
-        {
-            Properties.Clear();
-            if (SelectedComponent != null)
-            {
-                foreach(var property in SelectedComponent.GetType().GetProperties())
-                {
-                    var propertyAttribute = property.GetCustomAttributes(typeof(PropertyAttribute), false).FirstOrDefault() as PropertyAttribute;
-                    if (propertyAttribute != null)
-                    {
-                        switch (property.PropertyType.Name)
-                        {
-                            case "String":
-                                var stringProperty = new PropertyStringViewModel();
-                                stringProperty.Name = propertyAttribute.DisplayName ?? property.Name;
-                                stringProperty.Property = property;
-                                stringProperty.Item = SelectedComponent;
-                                Properties.Add(stringProperty);
-                                break;
-
-                            case "Single":
-                                var floatProperty = new PropertyFloatViewModel();
-                                floatProperty.Name = propertyAttribute.DisplayName ?? property.Name;
-                                floatProperty.Property = property;
-                                floatProperty.Item = SelectedComponent;
-                                floatProperty.StringFormat = propertyAttribute.StringFormat;
-                                Properties.Add(floatProperty);
-                                break;
-                        }
-                    }
-                }
-            }
-        }
-
     }
 }

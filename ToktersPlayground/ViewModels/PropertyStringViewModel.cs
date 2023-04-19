@@ -9,15 +9,16 @@ namespace ToktersPlayground.ViewModels
 {
     public class PropertyStringViewModel : PropertyBase
     {
+        public PropertyStringViewModel(PropertyEditorViewModel propertyEditor, PropertyDetail details) : base(propertyEditor, details)
+        {            
+        }
+
         public string Value
         {
-            get
-            {
-                return Property?.GetValue(Item)?.ToString() ?? string.Empty;
-            }
+            get => Editor.GetValue(Details, string.Empty).ToString() ?? string.Empty;
             set
             {
-                Property?.SetValue(Item, value);
+                Editor.SetValue(Details, value);
                 this.RaisePropertyChanged();
             }
         }

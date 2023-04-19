@@ -9,6 +9,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Assets\" />
+    <Folder Include="Components\ParagliderLayout\Views\" />
     <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
     <None Remove=".gitignore" />

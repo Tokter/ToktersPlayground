@@ -10,7 +10,7 @@ namespace ToktersPlayground.Components.LiftDragCurve.Commands
     /// <summary>
     /// Create a new lift drag curve component
     /// </summary>
-    [PlaygroundCommand("Components/Paragliding/Lift Drag Curve", PlaygroundCommandLocation.ComponentsMenu)]
+    [PlaygroundCommand("Add Component/Paragliding/Lift Drag Curve", PlaygroundCommandLocation.ComponentsMenu)]
     public class New : PlaygroundCommand
     {
         public override void Execute(IPlayground playgound)

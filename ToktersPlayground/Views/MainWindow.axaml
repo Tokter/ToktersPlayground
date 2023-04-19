@@ -3,7 +3,7 @@
         xmlns:vm="using:ToktersPlayground.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
         x:Class="ToktersPlayground.Views.MainWindow"
         Title="ToktersPlayground"
 		Width="1200"
@@ -41,12 +41,38 @@
 			<Path DockPanel.Dock="Left" Fill="Orange" Margin="2" Data="{StaticResource Tools}" />
 			<Label DockPanel.Dock="Left" Content="Tokter's Playgound" Foreground="Orange" VerticalContentAlignment="Center" FontWeight="Bold" />
 			<Menu DockPanel.Dock="Left" Items="{Binding MainMenu}" VerticalAlignment="Center" />
-			<Panel />
+      <Menu DockPanel.Dock="Left" Items="{Binding ComponentsMenu}" VerticalAlignment="Center" />
+      <Panel />
 		</DockPanel>
 
-		<DockPanel DockPanel.Dock="Right" MinWidth="200">
+    <Grid ColumnDefinitions="80*, 4, 20*">
+      <ContentControl Grid.Column="0" Content="{Binding ComponentViewModel}" />
+      
+      <GridSplitter Grid.Column="1" Background="Black" ResizeDirection="Columns"/>
+      
+      <Grid Grid.Column="2" RowDefinitions="*, 4, *">
+        <DockPanel Grid.Row="0">
+          <Label DockPanel.Dock="Top" Content="Components" Foreground="Orange" Margin="0,2,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="DimGray" />
+          <ListBox Items="{Binding Components}" SelectedItem="{Binding SelectedComponent}">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <DockPanel>
+                  <Label DockPanel.Dock="Right" Content="{Binding Type}" Foreground="{DynamicResource ThemeControlHighBrush}" VerticalContentAlignment="Center" />
+                  <Label Content="{Binding Name}" />
+                </DockPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </DockPanel>
+
+        <GridSplitter Grid.Row="1" Background="Black" ResizeDirection="Rows"/>
+
+        <ContentControl Grid.Row="2" Content="{Binding	PropertyEditor}" />
+      </Grid>
+    </Grid>
+
+      <!--
 			<DockPanel DockPanel.Dock="Top">
-				<Menu DockPanel.Dock="Left" Items="{Binding ComponentsMenu}" />
 				<ItemsControl DockPanel.Dock="Right" Items="{Binding ComponentTools}">
 					<ItemsControl.ItemTemplate>
 						<DataTemplate>
@@ -63,30 +89,6 @@
 				</ItemsControl>
 				<Label  />
 			</DockPanel>
-      
-			<ListBox DockPanel.Dock="Top" Height="400" Items="{Binding Components}" SelectedItem="{Binding SelectedComponent}">
-				<ListBox.ItemTemplate>
-					<DataTemplate>
-						<DockPanel>
-							<Label DockPanel.Dock="Right" Content="{Binding Type}" Foreground="{DynamicResource ThemeControlHighBrush}" VerticalContentAlignment="Center" />
-							<Label Content="{Binding Name}" />
-						</DockPanel>
-					</DataTemplate>
-				</ListBox.ItemTemplate>
-			</ListBox>
-
-      <ItemsControl Items="{Binding Properties}">
-        <ItemsControl.Styles>
-          <Style Selector="ItemsPresenter">
-            <Setter Property="(KeyboardNavigation.TabNavigation)" Value="Continue" />
-          </Style>
-        </ItemsControl.Styles>
-      </ItemsControl>
-
-    </DockPanel>
-		
-		<ContentControl Content="{Binding ComponentViewModel}" />
-
-	</DockPanel>
-
+      -->
+  </DockPanel>
 </Window>
