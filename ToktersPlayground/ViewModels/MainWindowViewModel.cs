@@ -6,7 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
+using System.Windows.Input;
 using ToktersPlayground.Components;
 using ToktersPlayground.Components.LiftDragCurve;
 
@@ -16,6 +18,9 @@ namespace ToktersPlayground.ViewModels
     {
         ObservableCollection<IPlaygoundComponent> Components { get; }
         IPlaygoundComponent? SelectedComponent { get; set; }
+        IPlaygoundComponent? CreateComponent(string type);
+        string ProjectFileName { get; set; }
+        void Clear();
     }
 
     public class MainWindowViewModel : ViewModelBase, IPlayground
@@ -28,11 +33,21 @@ namespace ToktersPlayground.ViewModels
         public ObservableCollection<PropertyBase> Properties { get; set; } = new ObservableCollection<PropertyBase>();
         public PropertyEditorViewModel PropertyEditor { get; set; } = new PropertyEditorViewModel();
 
-        public MainWindowViewModel()
+        public MainWindowViewModel(Control view)
         {
+            View = view;
             MainMenu = BuildMenuItems(PlaygroundCommandLocation.MainMenu).Items;
             ComponentsMenu = BuildMenuItems(PlaygroundCommandLocation.ComponentsMenu).Items;
-            ComponentTools = BuildMenuItems(PlaygroundCommandLocation.ComponentsTools).Items;
+            Components.CollectionChanged += (s, e) =>
+            {
+                RefreshCommands();
+            };
+        }
+
+        public void Clear()
+        {
+            SelectedComponent = null;
+            Components.Clear();
         }
 
         private IPlaygoundComponent? _selectedComponent;
@@ -43,14 +58,41 @@ namespace ToktersPlayground.ViewModels
             {
                 this.RaiseAndSetIfChanged(ref _selectedComponent, value);
                 this.RaisePropertyChanged(nameof(ComponentViewModel));
+                if (_selectedComponent != null)
+                {
+                    ComponentTools = BuildMenuItems(PlaygroundCommandLocation.ComponentsTools, _selectedComponent.GetType()).Items;
+                    this.RaisePropertyChanged(nameof(ComponentTools));
+                }
                 RefreshCommands();
                 PropertyEditor.SelectObject(_selectedComponent);
             }
         }
 
-        public ViewModelBase? ComponentViewModel => _selectedComponent?.ViewModel;
+        public IPlaygoundComponent? CreateComponent(string type)
+        {
+            var typesWithMyAttribute = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsDefined(typeof(PlaygroundComponentAttribute)));
+            foreach(var t in typesWithMyAttribute)
+            {
+                if (t.GetCustomAttribute<PlaygroundComponentAttribute>().Type == type)
+                {
+                    var component = Activator.CreateInstance(t) as IPlaygoundComponent;
+                    if (component != null)
+                    {
+                        Components.Add(component);
+                        SelectedComponent = component;
+                        return component;
+                    }
+                }
+            }
+            return null;
+        }
 
-        private MenuViewModel BuildMenuItems(PlaygroundCommandLocation location)
+        public string ProjectFileName { get; set; } = "New.playground";
+
+        public ViewModelBase? ComponentViewModel => _selectedComponent?.ViewModel;
+        public IPlayground Playground => this;
+
+        private MenuViewModel BuildMenuItems(PlaygroundCommandLocation location, Type? componentType = null)
         {
             MenuViewModel root = new MenuViewModel(this);
             var type = typeof(IPlaygroundCommand);
@@ -59,7 +101,7 @@ namespace ToktersPlayground.ViewModels
             foreach (var command in commands)
             {
                 var attribute = command.GetCustomAttributes(typeof(PlaygroundCommandAttribute), false).FirstOrDefault() as PlaygroundCommandAttribute;
-                if (attribute != null && attribute.Location == location)
+                if (attribute != null && attribute.Location == location && (attribute.ComponentType==null || attribute.ComponentType==componentType))
                 {
                     var commandInstance = Activator.CreateInstance(command) as IPlaygroundCommand;
                     if (commandInstance != null)
@@ -70,6 +112,9 @@ namespace ToktersPlayground.ViewModels
                             Command = commandInstance,
                             Order = attribute.Order,
                         };
+
+                        commandInstance.StorageProvider = TopLevel.GetTopLevel(this.View)?.StorageProvider;
+
 
                         if (!string.IsNullOrEmpty(attribute.Icon))
                         {
@@ -107,22 +152,23 @@ namespace ToktersPlayground.ViewModels
                     }
                 }
             }
-
             return root;
         }
 
         private void RefreshCommands()
         {
-            RefreshCommands(MainMenu!);
-            RefreshCommands(ComponentsMenu!);
-            RefreshCommands(ComponentTools!);
+            RefreshCommands(MainMenu);
+            RefreshCommands(ComponentsMenu);
+            RefreshCommands(ComponentTools);
         }
 
-        private void RefreshCommands(IList<MenuViewModel> items)
+        private void RefreshCommands(IList<MenuViewModel>? items)
         {
+            if (items == null) return;
             foreach (var item in items)
             {
-                item.TriggerRefresh();
+                item.Command?.RaiseCanExecuteChanged();
+                if (item.Items!= null) RefreshCommands(item.Items);
             }
         }
     }

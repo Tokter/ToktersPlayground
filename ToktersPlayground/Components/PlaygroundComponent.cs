@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,10 +14,18 @@ namespace ToktersPlayground.Components
     {
         private string _name = "New Component";
         private ViewModelBase? _viewModel = null;
-
         public string Type { get; protected set; } = "Playground Component";
 
-        [Property("Name")]
+        public PlaygroundComponent()
+        {
+            var attr = this.GetType().GetCustomAttribute<PlaygroundComponentAttribute>();
+            if (attr != null)
+            {
+                Type = attr.Type;
+            }
+        }
+
+        [Property("(Name)")]
         public string Name
         {
             get => _name;

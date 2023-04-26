@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -43,6 +44,7 @@ namespace ToktersPlayground.ViewModels
         private void BuildPropertyList()
         {
             _propertyDetails.Clear();
+            Properties.Clear();
 
             foreach (var obj in _selectedObjects)
             {
@@ -60,7 +62,7 @@ namespace ToktersPlayground.ViewModels
                 _propertyDetails.Add(details);
             }
 
-            foreach (var pd in _propertyDetails)
+            foreach (var pd in _propertyDetails.OrderBy(p=>p.Attribute.DisplayName))
             {
                 switch (pd.Attribute.EditorType)
                 {

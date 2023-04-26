@@ -1,19 +1,21 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using ToktersPlayground.Components.LiftDragCurve.ViewModels;
 using ToktersPlayground.ViewModels;
 
 namespace ToktersPlayground.Components.LiftDragCurve
 {
-    public class LiftDragCurve : PlaygroundComponent
+    [PlaygroundComponent("Lift/Drag Curve")]
+    public class LiftDragCurve : PlaygroundComponent, ICanBeLoadedSaved
     {
         public LiftDragCurve()
         {
             Name = "New Curve";
-            Type = "Lift/Drag Curve";
         }
 
         [Property("AOA Min", "n0")]
@@ -38,5 +40,29 @@ namespace ToktersPlayground.Components.LiftDragCurve
         {
             return new LiftDragCurveViewModel(this);
         }
+
+        #region ICanBeLoadedSaved
+
+        public void SaveTo(XmlWriter writer)
+        {
+            writer.WriteAttributeString("AngleOfAttackMin", AngleOfAttackMin.ToString());
+            writer.WriteAttributeString("AngleOfAttackMax", AngleOfAttackMax.ToString());
+            writer.WriteAttributeString("LiftCoefficientMin", LiftCoefficientMin.ToString());
+            writer.WriteAttributeString("LiftCoefficientMax", LiftCoefficientMax.ToString());
+            writer.WriteAttributeString("DragCoefficientMin", DragCoefficientMin.ToString());
+            writer.WriteAttributeString("DragCoefficientMax", DragCoefficientMax.ToString());
+        }
+
+        public void LoadFrom(XmlElement element)
+        {
+            AngleOfAttackMin = float.Parse(element.GetAttribute("AngleOfAttackMin"));
+            AngleOfAttackMax = float.Parse(element.GetAttribute("AngleOfAttackMax"));
+            LiftCoefficientMin = float.Parse(element.GetAttribute("LiftCoefficientMin"));
+            LiftCoefficientMax = float.Parse(element.GetAttribute("LiftCoefficientMax"));
+            DragCoefficientMin = float.Parse(element.GetAttribute("DragCoefficientMin"));
+            DragCoefficientMax = float.Parse(element.GetAttribute("DragCoefficientMax"));
+        }
+
+        #endregion
     }
 }

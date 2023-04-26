@@ -13,4 +13,15 @@ namespace ToktersPlayground
         string Name { get; set; }
         ViewModelBase ViewModel { get; }
     }
+
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    public class PlaygroundComponentAttribute : Attribute
+    {
+        public string Type { get; set; }
+
+        public PlaygroundComponentAttribute(string typeName)
+        {
+            Type = typeName;   
+        }
+    }
 }

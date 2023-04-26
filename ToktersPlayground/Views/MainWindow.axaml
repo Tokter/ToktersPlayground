@@ -13,10 +13,6 @@
 		ExtendClientAreaChromeHints="PreferSystemChrome"
 		>
 
-    <Design.DataContext>
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
-
 	<Window.Resources>
 		<StreamGeometry x:Key="Tools">
 			M16.06 13.09L21.69 18.68L18.37 21.96L12.78 16.37V15.45L15.14 13.09H16.06M16.97 10.56L16 9.6L11.21 14.4V16.37L5.58 22L2.3 18.68L7.89 13.09H9.86L10.64 12.31L6.8 8.46H5.5L2.69 5.62L5.31 3L8.11 5.8V7.11L12 10.95L14.66 8.29L13.7 7.28L15 5.97H12.34L11.69 5.32L15 2L15.66 2.66V5.32L16.97 4L20.25 7.28C21.34 8.38 21.34 10.17 20.25 11.26L18.28 9.25L16.97 10.56Z
@@ -27,7 +23,8 @@
 		<Style Selector="MenuItem">
 			<Setter Property="Header" Value="{Binding Name}"/>
 			<Setter Property="Items" Value="{Binding Items}"/>
-			<Setter Property="Command" Value="{Binding Run}"/>
+			<Setter Property="Command" Value="{Binding Command}"/>
+      <Setter Property="CommandParameter" Value="{Binding Playground}"/>
 			<Setter Property="Icon">
 				<Template>
 					<PathIcon Data="{Binding Icon}" Width="14" Height="14" />
@@ -40,15 +37,32 @@
 		<DockPanel DockPanel.Dock="Top">
 			<Path DockPanel.Dock="Left" Fill="Orange" Margin="2" Data="{StaticResource Tools}" />
 			<Label DockPanel.Dock="Left" Content="Tokter's Playgound" Foreground="Orange" VerticalContentAlignment="Center" FontWeight="Bold" />
-			<Menu DockPanel.Dock="Left" Items="{Binding MainMenu}" VerticalAlignment="Center" />
+      <Menu DockPanel.Dock="Left" Items="{Binding MainMenu}" VerticalAlignment="Center" />       
       <Menu DockPanel.Dock="Left" Items="{Binding ComponentsMenu}" VerticalAlignment="Center" />
       <Panel />
 		</DockPanel>
 
     <Grid ColumnDefinitions="80*, 4, 20*">
-      <ContentControl Grid.Column="0" Content="{Binding ComponentViewModel}" />
-      
-      <GridSplitter Grid.Column="1" Background="Black" ResizeDirection="Columns"/>
+      <DockPanel Grid.Column="0">
+        <ItemsControl DockPanel.Dock="Top" Items="{Binding ComponentTools}" Height="30">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Button Command="{Binding Command}" ToolTip.Tip="{Binding Name}" Margin="4">
+                <PathIcon Data="{Binding Icon}" Width="14" Height="14" />
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+
+        <ContentControl Content="{Binding ComponentViewModel}" />
+      </DockPanel>
+
+      <GridSplitter Grid.Column="1" Background="Black" ResizeDirection="Columns" />
       
       <Grid Grid.Column="2" RowDefinitions="*, 4, *">
         <DockPanel Grid.Row="0">

@@ -6,10 +6,10 @@
     <!--Avalonia doesen't support TrimMode=link currently,but we are working on that https://github.com/AvaloniaUI/Avalonia/issues/6892 -->
     <TrimMode>copyused</TrimMode>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <AssemblyVersion>1.0.0.1</AssemblyVersion>
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="Assets\" />
-    <Folder Include="Components\ParagliderLayout\Views\" />
     <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
     <None Remove=".gitignore" />

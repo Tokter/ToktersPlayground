@@ -1,8 +1,13 @@
-﻿using System;
+﻿using Avalonia.Platform.Storage;
+using ReactiveUI;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using ToktersPlayground.ViewModels;
 
 namespace ToktersPlayground
@@ -10,10 +15,11 @@ namespace ToktersPlayground
     /// <summary>
     /// Playground command that can be placed somewhere in the user interface
     /// </summary>
-    public interface IPlaygroundCommand
+    public interface IPlaygroundCommand : ICommand
     {
-        void Execute(IPlayground playgound);
-        bool CanExecute(IPlayground playgound);
+        IStorageProvider? StorageProvider { get; set; }
+        Task ExecuteAsync(object? paramter);
+        void RaiseCanExecuteChanged();
     }
 
     public enum PlaygroundCommandLocation
@@ -30,6 +36,7 @@ namespace ToktersPlayground
         public PlaygroundCommandLocation Location { get; set;}
         public int Order { get; set; } = 100;
         public string? Icon { get; set; }
+        public Type? ComponentType { get; set; } = null;
 
         public PlaygroundCommandAttribute(string name, PlaygroundCommandLocation location, int order = 100, string? icon = null)
         {
@@ -42,13 +49,37 @@ namespace ToktersPlayground
 
     public class PlaygroundCommand : IPlaygroundCommand
     {
-        public virtual bool CanExecute(IPlayground playgound)
+        public IStorageProvider? StorageProvider { get; set; }
+
+        public event EventHandler? CanExecuteChanged;
+
+        public virtual bool CanExecute(object? parameter)
         {
-            return true;
+            throw new NotImplementedException();
         }
 
-        public virtual void Execute(IPlayground playgound)
+        public virtual Task ExecuteAsync(object? parameter)
         {
+            throw new NotImplementedException();
         }
+
+        public void RaiseCanExecuteChanged()
+        {
+            CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        #region Explicit implementations
+        bool ICommand.CanExecute(object? parameter)
+        {
+            return CanExecute(parameter);
+        }
+
+        void ICommand.Execute(object? parameter)
+        {
+            ExecuteAsync(parameter);
+        }
+        #endregion
     }
+
+
 }
