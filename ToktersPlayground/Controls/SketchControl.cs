@@ -1,14 +1,17 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
 using Avalonia.Threading;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using ToktersPlayground.Controls.SceneGraph;
@@ -31,6 +34,7 @@ namespace ToktersPlayground.Controls
             PointerPressed += DemoControl_PointerPressed;
             PointerReleased += DemoControl_PointerReleased;
             PointerWheelChanged += DemoControl_PointerWheelChanged;
+            this.Focusable = true;
             KeyDown += DemoControl_KeyDown;
             KeyUp += DemoControl_KeyUp;
         }

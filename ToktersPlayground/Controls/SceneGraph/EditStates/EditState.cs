@@ -11,7 +11,7 @@ namespace ToktersPlayground.Controls.SceneGraph.EditStates
 {
     public enum InspectResult
     {
-        Ignore,
+        IgnoreMe,
         ActivateMe,
     }
 
@@ -57,7 +57,7 @@ namespace ToktersPlayground.Controls.SceneGraph.EditStates
         /// <returns>InspectResult that tells us whether we want to be activated or not.</returns>
         public virtual InspectResult InspectEvent(InputEvent inputEvent)
         {
-            return InspectResult.Ignore;
+            return InspectResult.IgnoreMe;
         }
 
         /// <summary>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ToktersPlayground.Components.LiftDragCurve.ViewModels;
+using ToktersPlayground.Components.ParagliderLayout.SceneGraph;
 using ToktersPlayground.Components.ParagliderLayout.ViewModels;
 using ToktersPlayground.ViewModels;
 
@@ -11,6 +12,8 @@ namespace ToktersPlayground.Components.ParagliderLayout
 {
     public class ParagliderLayout : PlaygroundComponent
     {
+        public ParagliderLayoutControl? LayoutControl { get; set; }    
+
         public ParagliderLayout()
         {
             Name = "New Paraglider Layout";

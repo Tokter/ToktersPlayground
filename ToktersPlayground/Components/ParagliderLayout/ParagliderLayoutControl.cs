@@ -9,6 +9,7 @@ using ToktersPlayground.Controls.SceneGraph.EditStates;
 using ToktersPlayground.Controls.SceneGraph;
 using ToktersPlayground.Controls;
 using ToktersPlayground.Components.ParagliderLayout.ViewModels;
+using ToktersPlayground.Components.ParagliderLayout.SceneGraph;
 
 namespace ToktersPlayground.Components.ParagliderLayout
 {
@@ -23,6 +24,7 @@ namespace ToktersPlayground.Components.ParagliderLayout
             Scene.Root.Add(_plNode);
             Scene.RegisterEditState(new Pan());
             Scene.RegisterEditState(new Zoom());
+            Scene.RegisterEditState(new InsertVertex());
 
             DataContextChanged += ParagliderLayoutControl_DataContextChanged;
         }
@@ -32,6 +34,7 @@ namespace ToktersPlayground.Components.ParagliderLayout
             if (DataContext is ParagliderLayoutViewModel vm)
             {
                 _plNode.Layout = vm.Layout;
+                vm.Layout.LayoutControl = this;
             }
         }
     }

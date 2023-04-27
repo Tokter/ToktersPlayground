@@ -44,10 +44,10 @@
 
     <Grid ColumnDefinitions="80*, 4, 20*">
       <DockPanel Grid.Column="0">
-        <ItemsControl DockPanel.Dock="Top" Items="{Binding ComponentTools}" Height="30">
+        <ItemsControl DockPanel.Dock="Top" Items="{Binding ComponentTools}" Height="30" Background="Transparent">
           <ItemsControl.ItemTemplate>
             <DataTemplate>
-              <Button Command="{Binding Command}" ToolTip.Tip="{Binding Name}" Margin="4">
+              <Button Command="{Binding Command}" CommandParameter="{Binding Component}" ToolTip.Tip="{Binding Name}" Margin="4">
                 <PathIcon Data="{Binding Icon}" Width="14" Height="14" />
               </Button>
             </DataTemplate>

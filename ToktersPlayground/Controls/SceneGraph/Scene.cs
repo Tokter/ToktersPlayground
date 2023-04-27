@@ -141,6 +141,19 @@ namespace ToktersPlayground.Controls.SceneGraph
             }
         }
 
+        public void Activate(string name)
+        {
+            if (ActiveState == null)
+            {
+                var newState = _availableStates.FirstOrDefault(s => s?.Name?.ToLower().Trim() == name.ToLower().Trim());
+                if (newState != null)
+                {
+                    newState.Activated();
+                    _activeState.Push(newState);
+                }
+            }
+        }
+
         /// <summary>
         /// Processes the input event and returns true if the event was handled
         /// </summary>
@@ -172,7 +185,7 @@ namespace ToktersPlayground.Controls.SceneGraph
             //If no state is active, check if we need to change the cursor back to the default
             if (ActiveState == null && _currentCursor != StandardCursorType.Arrow)
             {
-                SetCursor(new Cursor(StandardCursorType.Arrow));
+                SetCursor(StandardCursorType.Arrow);
             }
 
             if (ActiveState == null) return false;
@@ -199,9 +212,11 @@ namespace ToktersPlayground.Controls.SceneGraph
 
         public Action<Cursor>? ChangeCursor { get; set; }
 
-        public void SetCursor(Cursor cursor)
+
+        public void SetCursor(StandardCursorType cursor)
         {
-            if (ChangeCursor != null) ChangeCursor(cursor);
+            _currentCursor = cursor;
+            if (ChangeCursor != null) ChangeCursor(new Cursor(cursor));
         }
 
         #endregion

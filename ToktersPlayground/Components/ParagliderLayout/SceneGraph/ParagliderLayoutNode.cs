@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ToktersPlayground.Controls.SceneGraph;
 
-namespace ToktersPlayground.Components.ParagliderLayout
+namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
 {
     public class ParagliderLayoutNode : SceneNode
     {

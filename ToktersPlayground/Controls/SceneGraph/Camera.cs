@@ -24,19 +24,40 @@ namespace ToktersPlayground.Controls.SceneGraph
         public float Rotation
         {
             get => _rotation;
-            set { _rotation = value; _viewTransformIsDirty = true; }
+            set
+            {
+                if (_rotation != value)
+                {
+                    _rotation = value;
+                    _viewTransformIsDirty = true;
+                }
+            }
         }
 
         public Vector2 Position
         {
             get => _position;
-            set { _position = value; _viewTransformIsDirty = true; }
+            set 
+            {
+                if (_position != value)
+                {
+                    _position = value; 
+                    _viewTransformIsDirty = true;
+                }
+            }
         }
 
         public float Scale
         {
             get => _scale;
-            set { _scale = value; _viewTransformIsDirty = true; }
+            set
+            {
+                if ( _scale != value)
+                {
+                    _scale = value;
+                    _viewTransformIsDirty = true;
+                }
+            }
         }
 
         private float _screenWidth;
@@ -45,13 +66,27 @@ namespace ToktersPlayground.Controls.SceneGraph
         public float ScreenWidth
         {
             get => _screenWidth;
-            set { _screenWidth = value; _viewTransformIsDirty = true; }
+            set 
+            {
+                if (_screenWidth != value)
+                {
+                    _screenWidth = value;
+                    _viewTransformIsDirty = true;
+                }
+            }
         }
 
         public float ScreenHeight
         {
             get => _screenHeight;
-            set { _screenHeight = value; _viewTransformIsDirty = true; }
+            set 
+            {
+                if (_screenHeight != value)
+                {
+                    _screenHeight = value;
+                    _viewTransformIsDirty = true;
+                }
+            }
         }
 
         public void ApplyModelViewTransformToSurface(SKCanvas canvas, Matrix3x2 modelTransform, Matrix3x2 invModelTransform)
@@ -63,7 +98,9 @@ namespace ToktersPlayground.Controls.SceneGraph
                 _viewTransformIsDirty = false;
             }
 
-            _modelViewtransform = modelTransform * _viewTransform;
+            var deviceClip = canvas.DeviceClipBounds;
+
+            _modelViewtransform = modelTransform * _viewTransform * Matrix3x2.CreateTranslation(new Vector2(deviceClip.Left, deviceClip.Top));
             _modelViewInvTransform = _viewInvTransform * invModelTransform;
             canvas.SetMatrix(new SKMatrix(_modelViewtransform.M11, _modelViewtransform.M21, _modelViewtransform.M31, _modelViewtransform.M12, _modelViewtransform.M22, _modelViewtransform.M32, 0, 0, 1));
         }

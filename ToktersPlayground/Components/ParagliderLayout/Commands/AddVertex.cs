@@ -20,6 +20,10 @@ namespace ToktersPlayground.Components.ParagliderLayout.Commands
 
         public override Task ExecuteAsync(object? parameter)
         {
+            if (parameter is ParagliderLayout layout && layout.LayoutControl != null)
+            {
+                layout.LayoutControl.Scene.Activate("InsertVertex");
+            }
             return Task.CompletedTask;
         }
     }

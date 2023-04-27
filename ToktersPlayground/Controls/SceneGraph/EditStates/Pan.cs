@@ -20,7 +20,7 @@ namespace ToktersPlayground.Controls.SceneGraph.EditStates
                 _mouseDownPos = inputEvent.MousePos;
                 return InspectResult.ActivateMe;
             }
-            return InspectResult.Ignore;
+            return InspectResult.IgnoreMe;
         }
 
         public override ProcessResult ProcessEvent(InputEvent inputEvent)

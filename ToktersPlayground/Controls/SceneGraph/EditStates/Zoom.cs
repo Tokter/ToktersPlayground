@@ -10,7 +10,7 @@ namespace ToktersPlayground.Controls.SceneGraph.EditStates
     {
         public override InspectResult InspectEvent(InputEvent inputEvent)
         {
-            return inputEvent.InputEventType == InputEventType.MouseWheel ? InspectResult.ActivateMe : InspectResult.Ignore;
+            return inputEvent.InputEventType == InputEventType.MouseWheel ? InspectResult.ActivateMe : InspectResult.IgnoreMe;
         }
 
         public override ProcessResult ProcessEvent(InputEvent inputEvent)
