@@ -11,14 +11,15 @@ using System.Text;
 using System.Windows.Input;
 using ToktersPlayground.Components;
 using ToktersPlayground.Components.LiftDragCurve;
+using ToktersPlayground.Controls.SceneGraph;
 
 namespace ToktersPlayground.ViewModels
 {
     public interface IPlayground
     {
-        ObservableCollection<IPlaygoundComponent> Components { get; }
-        IPlaygoundComponent? SelectedComponent { get; set; }
-        IPlaygoundComponent? CreateComponent(string type);
+        ObservableCollection<IPlaygroundComponent> Components { get; }
+        IPlaygroundComponent? SelectedComponent { get; set; }
+        IPlaygroundComponent? CreateComponent(string type);
         string ProjectFileName { get; set; }
         void Clear();
     }
@@ -29,7 +30,7 @@ namespace ToktersPlayground.ViewModels
         public IList<MenuViewModel>? MainMenu { get; set; }
         public IList<MenuViewModel>? ComponentsMenu { get; set; }
         public IList<MenuViewModel>? ComponentTools { get; set; }
-        public ObservableCollection<IPlaygoundComponent> Components { get; set; } = new ObservableCollection<IPlaygoundComponent>();
+        public ObservableCollection<IPlaygroundComponent> Components { get; set; } = new ObservableCollection<IPlaygroundComponent>();
         public ObservableCollection<PropertyBase> Properties { get; set; } = new ObservableCollection<PropertyBase>();
         public PropertyEditorViewModel PropertyEditor { get; set; } = new PropertyEditorViewModel();
 
@@ -50,8 +51,19 @@ namespace ToktersPlayground.ViewModels
             Components.Clear();
         }
 
-        private IPlaygoundComponent? _selectedComponent;
-        public IPlaygoundComponent? SelectedComponent
+        private int _selectedTab = 0;
+        public int SelectedTab
+        {
+            get => _selectedTab;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _selectedTab, value);
+                UpdatePropertyEditor();
+            }
+        }
+
+        private IPlaygroundComponent? _selectedComponent;
+        public IPlaygroundComponent? SelectedComponent
         {
             get => _selectedComponent;
             set
@@ -64,18 +76,49 @@ namespace ToktersPlayground.ViewModels
                     this.RaisePropertyChanged(nameof(ComponentTools));
                 }
                 RefreshCommands();
-                PropertyEditor.SelectObject(_selectedComponent);
+                UpdatePropertyEditor();
+                this.RaisePropertyChanged(nameof(Nodes));
             }
         }
 
-        public IPlaygoundComponent? CreateComponent(string type)
+        public SceneNode? Nodes
+        {
+            get => _selectedComponent?.Sketch?.Scene.Root;
+        }
+        
+        private SceneNode? _selectedNode;
+        public SceneNode? SelectedNode
+        {
+            get => _selectedNode;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _selectedNode, value);
+                UpdatePropertyEditor();
+            }
+        }
+
+        private void UpdatePropertyEditor()
+        {
+            switch (_selectedTab)
+            {
+                case 0:
+                    PropertyEditor.SelectObject(_selectedComponent);
+                    break;
+
+                case 1:
+                    PropertyEditor.SelectObject(_selectedNode);
+                    break;
+            }
+        }
+
+        public IPlaygroundComponent? CreateComponent(string type)
         {
             var typesWithMyAttribute = Assembly.GetExecutingAssembly().GetTypes().Where(t => t.IsDefined(typeof(PlaygroundComponentAttribute)));
             foreach(var t in typesWithMyAttribute)
             {
-                if (t.GetCustomAttribute<PlaygroundComponentAttribute>().Type == type)
+                if (t.GetCustomAttribute<PlaygroundComponentAttribute>()?.Type == type)
                 {
-                    var component = Activator.CreateInstance(t) as IPlaygoundComponent;
+                    var component = Activator.CreateInstance(t) as IPlaygroundComponent;
                     if (component != null)
                     {
                         Components.Add(component);

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using ToktersPlayground.Components.ParagliderLayout;
 using ToktersPlayground.Controls.SceneGraph;
 
 namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
@@ -12,8 +13,6 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
     public class ParagliderLayoutNode : SceneNode
     {
         private SKPaint _symmetryPaint;
-        private List<Vertex> _vertices = new List<Vertex>();
-
         public ParagliderLayout? Layout { get; set; }
 
         public ParagliderLayoutNode()

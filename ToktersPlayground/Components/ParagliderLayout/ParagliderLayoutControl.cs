@@ -24,6 +24,8 @@ namespace ToktersPlayground.Components.ParagliderLayout
             Scene.Root.Add(_plNode);
             Scene.RegisterEditState(new Pan());
             Scene.RegisterEditState(new Zoom());
+            Scene.RegisterEditState(new Drag());
+            Scene.RegisterEditState(new Select());
             Scene.RegisterEditState(new InsertVertex());
 
             DataContextChanged += ParagliderLayoutControl_DataContextChanged;
@@ -34,7 +36,7 @@ namespace ToktersPlayground.Components.ParagliderLayout
             if (DataContext is ParagliderLayoutViewModel vm)
             {
                 _plNode.Layout = vm.Layout;
-                vm.Layout.LayoutControl = this;
+                vm.Layout.Sketch = this;
             }
         }
     }

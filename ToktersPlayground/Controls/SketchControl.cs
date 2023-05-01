@@ -93,7 +93,7 @@ namespace ToktersPlayground.Controls
             {
                 var point = e.GetCurrentPoint(this);
 
-                var inputEvent = InputEvent.MouseUp((float)point.Position.X, (float)point.Position.Y, ToButton(point.Properties),
+                var inputEvent = InputEvent.MouseUp((float)point.Position.X, (float)point.Position.Y, ToButton(e.InitialPressMouseButton),
                     e.KeyModifiers.HasFlag(KeyModifiers.Shift),
                     e.KeyModifiers.HasFlag(KeyModifiers.Control),
                     e.KeyModifiers.HasFlag(KeyModifiers.Alt));
@@ -140,6 +140,19 @@ namespace ToktersPlayground.Controls
             if (prop.IsXButton2Pressed) result |= MouseButtons.XButton2;
 
             return result;
+        }
+
+        private MouseButtons ToButton(MouseButton button)
+        {
+            switch(button)
+            {
+                case MouseButton.Left: return MouseButtons.Left;
+                case MouseButton.Right: return MouseButtons.Right;
+                case MouseButton.Middle: return MouseButtons.Middle;
+                case MouseButton.XButton1: return MouseButtons.XButton1;
+                case MouseButton.XButton2: return MouseButtons.XButton2;
+                default: return MouseButtons.None;
+            }
         }
 
         #endregion

@@ -82,7 +82,7 @@ namespace ToktersPlayground.Controls.SceneGraph
 
             //Draw in screen space
             canvas.Save();
-            DrawUISceneNode(canvas, Root, UICamera);
+            DrawUISceneNode(canvas, Root, Camera);
             if (!string.IsNullOrEmpty(ActiveState?.Description))
             {
                 canvas.DrawText($"{ActiveState.Description} - [Esc] to abort", 30, Camera.ScreenHeight - 30, _stateText);
@@ -238,6 +238,10 @@ namespace ToktersPlayground.Controls.SceneGraph
 
         public void Dispose()
         {
+            foreach(var s in _availableStates)
+            {
+                if (s is IDisposable d) d.Dispose();
+            }
         }
     }
 }

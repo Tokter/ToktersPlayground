@@ -3,7 +3,9 @@
         xmlns:vm="using:ToktersPlayground.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:nodes="using:ToktersPlayground.Controls.SceneGraph"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+        Icon="/Assets/ToktersPlayground.ico"
         x:Class="ToktersPlayground.Views.MainWindow"
         Title="ToktersPlayground"
 		Width="1200"
@@ -31,6 +33,9 @@
 				</Template>
 			</Setter>
 		</Style>
+    <Style Selector="TabItem">
+      <Setter Property="Foreground" Value="Orange" />
+    </Style>
 	</Window.Styles>
 
 	<DockPanel>
@@ -42,7 +47,7 @@
       <Panel />
 		</DockPanel>
 
-    <Grid ColumnDefinitions="80*, 4, 20*">
+    <Grid ColumnDefinitions="*, 4, 250">
       <DockPanel Grid.Column="0">
         <ItemsControl DockPanel.Dock="Top" Items="{Binding ComponentTools}" Height="30" Background="Transparent">
           <ItemsControl.ItemTemplate>
@@ -66,17 +71,36 @@
       
       <Grid Grid.Column="2" RowDefinitions="*, 4, *">
         <DockPanel Grid.Row="0">
-          <Label DockPanel.Dock="Top" Content="Components" Foreground="Orange" Margin="0,2,0,0" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Background="DimGray" />
-          <ListBox Items="{Binding Components}" SelectedItem="{Binding SelectedComponent}">
-            <ListBox.ItemTemplate>
-              <DataTemplate>
-                <DockPanel>
-                  <Label DockPanel.Dock="Right" Content="{Binding Type}" Foreground="{DynamicResource ThemeControlHighBrush}" VerticalContentAlignment="Center" />
-                  <Label Content="{Binding Name}" />
-                </DockPanel>
-              </DataTemplate>
-            </ListBox.ItemTemplate>
-          </ListBox>
+          <TabControl DockPanel.Dock="Top" SelectedIndex="{Binding SelectedTab}">
+            <TabItem Header="Components">
+              <ListBox Items="{Binding Components}" SelectedItem="{Binding SelectedComponent}">
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <DockPanel>
+                      <Label DockPanel.Dock="Right" Content="{Binding Type}" Foreground="{DynamicResource ThemeControlHighBrush}" VerticalContentAlignment="Center" />
+                      <Label Content="{Binding Name}" />
+                    </DockPanel>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+
+            </TabItem>
+            <TabItem Header="Scene Graph">
+              <TreeView Items="{Binding Nodes}" SelectedItem="{Binding SelectedNode}">
+                <TreeView.DataTemplates>
+                  <TreeDataTemplate DataType="nodes:SceneNode" ItemsSource="{Binding .}">
+                    <DockPanel>
+                      <Label DockPanel.Dock="Right" Content="{Binding Type}" Foreground="{DynamicResource ThemeControlHighBrush}" VerticalContentAlignment="Center" />
+                      <Label Content="{Binding Name}" />
+                    </DockPanel>
+                  </TreeDataTemplate>
+                  <DataTemplate DataType="nodes:SceneNode">
+                    <TextBlock Text="{Binding Type}" />
+                  </DataTemplate>
+                </TreeView.DataTemplates>
+              </TreeView>
+            </TabItem>
+          </TabControl>
         </DockPanel>
 
         <GridSplitter Grid.Row="1" Background="Black" ResizeDirection="Rows"/>

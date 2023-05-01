@@ -10,10 +10,22 @@ using ToktersPlayground.Controls.SceneGraph;
 
 namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
 {
-    public class VertexNode : SceneNode
+    public enum VertexType
+    {
+        Simple,
+        AttachmentPoint,
+    }
+
+    public class VertexNode : SceneNode, IDragable
     {
         private SKPaint _vertexPaint;
         private const float VertexSize = 4.0f;
+
+        [Property("Vertex Type")]
+        public VertexType VertexType { get; set; } = VertexType.Simple;
+
+        [Property("Is On Perimeter")]
+        public bool IsOnPerimeter { get; set; }
 
         public VertexNode()
         {
@@ -21,13 +33,44 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
             _vertexPaint.Color = SKColors.White;
             _vertexPaint.StrokeWidth = 1.0f;
             _vertexPaint.IsAntialias = true;
+            _vertexPaint.TextSize = 10.0f;
         }
 
         public override void DrawScene(SKCanvas canvas, Camera camera)
         {
-            var test = camera.ToWorld(new Vector2(0, 0));
-            canvas.DrawLine(-VertexSize, 0, VertexSize, 0, _vertexPaint);
-            canvas.DrawLine(0, -VertexSize, 0, VertexSize, _vertexPaint);
+            _vertexPaint.Style = SKPaintStyle.Stroke;
+
+            if (Selected)
+            {
+                _vertexPaint.Style = SKPaintStyle.Stroke;
+                _vertexPaint.Color = SKColors.Red;
+                canvas.DrawCircle(0, 0, VertexSize + 2.0f, _vertexPaint);
+            }
+
+            switch (VertexType)
+            {
+                case VertexType.Simple:
+                    _vertexPaint.Color = SKColors.White;
+                    break;
+
+                case VertexType.AttachmentPoint:
+                    _vertexPaint.Color = SKColors.Green;
+                    break;
+            }
+
+            if (IsOnPerimeter)
+            {
+                canvas.DrawCircle(0, 0, VertexSize, _vertexPaint);
+            }
+            else
+            {
+                canvas.DrawLine(-VertexSize, 0, VertexSize, 0, _vertexPaint);
+                canvas.DrawLine(0, -VertexSize, 0, VertexSize, _vertexPaint);
+            }
+
+            _vertexPaint.Style = SKPaintStyle.Fill;
+            var width = _vertexPaint.MeasureText(Name);
+            canvas.DrawText(Name, -width / 2.0f, _vertexPaint.TextSize + 5.0f, _vertexPaint);
         }
 
         protected override void Dispose(bool disposing)
@@ -37,6 +80,32 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
                 _vertexPaint.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        public bool IntersectsWidth(Vector2 pos)
+        {
+            var localPos = ToLocal(pos);
+            return Vector2.Distance(Vector2.Zero, localPos) < 4.0f;
+        }
+
+        public bool InRect(Vector2 rect1, Vector2 rect2)
+        {
+            var topLeft = ToLocal(rect1);
+            var bottomRight = ToLocal(rect2);
+            //Switch topLeft and bottomRight if needed
+            if (topLeft.X > bottomRight.X)
+            {
+                var temp = topLeft.X;
+                topLeft.X = bottomRight.X;
+                bottomRight.X = temp;
+            }
+            if (topLeft.Y > bottomRight.Y)
+            {
+                var temp = topLeft.Y;
+                topLeft.Y = bottomRight.Y;
+                bottomRight.Y = temp;
+            }
+            return topLeft.X < 0 && bottomRight.X > 0 && topLeft.Y < 0 && bottomRight.Y > 0;
         }
     }
 }

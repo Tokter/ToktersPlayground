@@ -19,7 +19,7 @@ namespace ToktersPlayground.ViewModels
         private IPlayground _playground;
         public IPlaygroundCommand? Command { get; set; }
         public IPlayground Playground => _playground;
-        public IPlaygoundComponent? Component => _playground.SelectedComponent;
+        public IPlaygroundComponent? Component => _playground.SelectedComponent;
 
         public string Name { get; set; } = "Menu Item";
         public int Order { get; set; } = 100;

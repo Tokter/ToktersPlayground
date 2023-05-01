@@ -6,15 +6,19 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using ToktersPlayground.Controls;
+using ToktersPlayground.Controls.SceneGraph;
 using ToktersPlayground.ViewModels;
 
 namespace ToktersPlayground.Components
 {
-    public class PlaygroundComponent : IPlaygoundComponent, INotifyPropertyChanged
+    public class PlaygroundComponent : IPlaygroundComponent, INotifyPropertyChanged
     {
         private string _name = "New Component";
         private ViewModelBase? _viewModel = null;
         public string Type { get; protected set; } = "Playground Component";
+
+        public SketchControl? Sketch { get; set; }
 
         public PlaygroundComponent()
         {

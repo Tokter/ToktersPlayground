@@ -81,6 +81,24 @@ namespace ToktersPlayground.ViewModels
                                 floatProperty.StringFormat = pd.Attribute.StringFormat;
                                 Properties.Add(floatProperty);
                                 break;
+
+                            case "Boolean":
+                                var boolProperty = new PropertyBoolViewModel(this, pd);
+                                boolProperty.Name = pd.Attribute.DisplayName ?? pd.Property.Name;
+                                Properties.Add(boolProperty);
+                                break;
+
+                            default:
+                                switch (pd.Property.PropertyType.BaseType?.Name)
+                                {
+                                    case "Enum":
+                                        var enumProperty = new PropertyEnumViewModel(this, pd);
+                                        enumProperty.Name = pd.Attribute.DisplayName ?? pd.Property.Name;
+                                        enumProperty.EnumType = pd.Property.PropertyType;
+                                        Properties.Add(enumProperty);
+                                        break;
+                                }
+                                break;
                         }
                         break;
 

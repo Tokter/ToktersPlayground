@@ -2,15 +2,37 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using ToktersPlayground.Components;
 
 namespace ToktersPlayground.Controls.SceneGraph
 {
-    public class SceneNode : Collection<SceneNode>, ITransformable, IDisposable
+    public class SceneNode : Collection<SceneNode>, ITransformable, IDisposable, INotifyCollectionChanged, INotifyPropertyChanged
     {
+        private string _name = "New Node";
+
+        [Property("(Name)")]
+        public string Name
+        {
+            get => _name;
+            set
+            {
+                if (_name != value)
+                {
+                    _name = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string Type => this.GetType().Name;
+
         #region Scene Graph
 
         private SceneNode _parent = null!;
@@ -39,6 +61,10 @@ namespace ToktersPlayground.Controls.SceneGraph
         {
             item.Parent = this;
             base.InsertItem(index, item);
+            if (CollectionChanged != null)
+            {
+                CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+            }
         }
 
         protected override void ClearItems()
@@ -52,6 +78,10 @@ namespace ToktersPlayground.Controls.SceneGraph
 
         protected override void RemoveItem(int index)
         {
+            if (CollectionChanged != null)
+            {
+                CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, this[index], index));
+            }
             this[index].Dispose();
             base.RemoveItem(index);
         }
@@ -100,9 +130,9 @@ namespace ToktersPlayground.Controls.SceneGraph
         private Matrix3x2 _transform;
         private Matrix3x2 _invTransform;
 
-        //Convertes from the local to the world space
-        private Matrix3x2 _woldTransform;
-        private Matrix3x2 _invWoldTransform;
+        //Converts from the local to the world space
+        private Matrix3x2 _worldTransform;
+        private Matrix3x2 _invWorldTransform;
 
         public float Rotation
         {
@@ -128,6 +158,12 @@ namespace ToktersPlayground.Controls.SceneGraph
                     MarkTransformDirty();
                 }
             }
+        }
+
+        public Vector2 AbsPosition
+        {
+            get => ToAbs(Vector2.Zero);
+            set => Position = Parent.ToLocal(value);
         }
 
         public float Scale
@@ -167,19 +203,19 @@ namespace ToktersPlayground.Controls.SceneGraph
                 //Calculate world transforms
                 var stack = new Stack<Matrix3x2>();
                 stack.Push(_invTransform);
-                _woldTransform = _transform;
+                _worldTransform = _transform;
                 var parent = Parent;
                 while (parent != null)
                 {
-                    _woldTransform *= parent.GetTransform();
+                    _worldTransform *= parent.GetTransform();
                     stack.Push(parent.GetInvTransform());
                     parent = parent.Parent;
                 }
 
-                _invWoldTransform = Matrix3x2.Identity;
+                _invWorldTransform = Matrix3x2.Identity;
                 while (stack.Count > 0)
                 {
-                    _invWoldTransform *= stack.Pop();
+                    _invWorldTransform *= stack.Pop();
                 }
 
                 _isDirty = false;
@@ -201,7 +237,7 @@ namespace ToktersPlayground.Controls.SceneGraph
         public Vector2 ToAbs(Vector2 pos)
         {
             CalculateTransforms();
-            return Vector2.Transform(pos, _woldTransform);
+            return Vector2.Transform(pos, _worldTransform);
         }
 
         /// <summary>
@@ -212,7 +248,7 @@ namespace ToktersPlayground.Controls.SceneGraph
         public Vector2 ToLocal(Vector2 pos)
         {
             CalculateTransforms();
-            return Vector2.Transform(pos, _invWoldTransform);
+            return Vector2.Transform(pos, _invWorldTransform);
         }
 
         public void MarkTransformDirty()
@@ -252,6 +288,19 @@ namespace ToktersPlayground.Controls.SceneGraph
         //Override to intercept selection
         protected virtual void OnSelection()
         {
+        }
+
+        #endregion
+
+        #region INotifyCollectionChanged & INotifyPropertyChanged
+
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null!)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion

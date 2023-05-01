@@ -12,7 +12,7 @@ namespace ToktersPlayground.Components.ParagliderLayout
 {
     public class ParagliderLayout : PlaygroundComponent
     {
-        public ParagliderLayoutControl? LayoutControl { get; set; }    
+        public ParagliderLayoutControl? LayoutControl => this.Sketch as ParagliderLayoutControl;
 
         public ParagliderLayout()
         {

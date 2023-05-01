@@ -13,7 +13,7 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
     public class InsertVertex : EditState
     {
         private VertexNode? _vertex;
-        private ParagliderLayoutNode _layoutNode;
+        private ParagliderLayoutNode? _layoutNode;
 
         public InsertVertex()
         {
@@ -40,6 +40,8 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
 
         public override ProcessResult ProcessEvent(InputEvent inputEvent)
         {
+            if (_layoutNode == null) return ProcessResult.ImDone;
+
             switch (inputEvent.InputEventType)
             {
                 case InputEventType.KeyDown:
@@ -58,6 +60,7 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
 
                 case InputEventType.MouseDown:
                     _vertex = new VertexNode();
+                    _vertex.Name = "Vertex " + _layoutNode.Count(n => n is VertexNode);
                     _layoutNode.Add(_vertex);
                     _vertex.Selected = true;
 

@@ -7,12 +7,16 @@
     <TrimMode>copyused</TrimMode>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <AssemblyVersion>1.0.0.1</AssemblyVersion>
+    <ApplicationIcon>ToktersPlayground.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="Assets\" />
     <Folder Include="Models\" />
     <AvaloniaResource Include="Assets\**" />
     <None Remove=".gitignore" />
+    <None Remove="Assets\ToktersPlayground.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ToktersPlayground.ico" />
   </ItemGroup>
   <ItemGroup>
     <!--This helps with theme dll-s trimming.
