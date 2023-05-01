@@ -98,12 +98,20 @@ namespace ToktersPlayground.Controls.SceneGraph.EditStates
             //We select the points that intersect with the _startMousePos
             if (Vector2.Distance(_startMousePos, Scene.CurrentAbsMousePos) < 4.0f)
             {
-                intersectedObjects = Scene.Root.FindNodes(n => n is IIntersectable intersect && n.Visible && intersect.IntersectsWidth(_startMousePos)).ToList();
+                intersectedObjects = Scene.Root.FindNodes(n =>
+                    n is IIntersectable intersect 
+                    && intersect.CanBeSelected
+                    && n.Visible 
+                    && intersect.IntersectsWidth(_startMousePos)).ToList();
             }
             //We select the points that are inside the rectangle (_startMousePos, Scene.CurrentMousePos)
             else
             {
-                intersectedObjects = Scene.Root.FindNodes(n => n is IIntersectable intersect && n.Visible && intersect.InRect(_startMousePos, Scene.CurrentAbsMousePos)).ToList();
+                intersectedObjects = Scene.Root.FindNodes(n => 
+                    n is IIntersectable intersect
+                    && intersect.CanBeSelected
+                    && n.Visible 
+                    && intersect.InRect(_startMousePos, Scene.CurrentAbsMousePos)).ToList();
                 groupSelect = true;
             }
 

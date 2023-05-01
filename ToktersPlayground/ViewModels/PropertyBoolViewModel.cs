@@ -22,5 +22,10 @@ namespace ToktersPlayground.ViewModels
                 this.RaisePropertyChanged();
             }
         }
+
+        public override void Update()
+        {
+            this.RaisePropertyChanged(nameof(Value));
+        }
     }
 }

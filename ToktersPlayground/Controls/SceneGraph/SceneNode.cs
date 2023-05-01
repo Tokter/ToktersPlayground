@@ -1,4 +1,5 @@
-﻿using SkiaSharp;
+﻿using Avalonia;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,6 +7,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,8 +15,63 @@ using ToktersPlayground.Components;
 
 namespace ToktersPlayground.Controls.SceneGraph
 {
-    public class SceneNode : Collection<SceneNode>, ITransformable, IDisposable, INotifyCollectionChanged, INotifyPropertyChanged
+    public class SceneNodeList : Collection<SceneNode>, INotifyCollectionChanged
     {
+        private SceneNode _parent;
+
+        public SceneNodeList(SceneNode parent)
+        {
+            _parent = parent;
+        }
+
+        protected override void InsertItem(int index, SceneNode item)
+        {
+            item.Parent = _parent;
+            base.InsertItem(index, item);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
+        }
+
+        protected override void ClearItems()
+        {
+            for (int i = 0; i < Count; i++)
+            {
+                this[i].Dispose();
+            }
+            base.ClearItems();
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+        }
+
+        protected override void RemoveItem(int index)
+        {
+            SceneNode removedItem = this[index];
+            base.RemoveItem(index);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, removedItem, index));
+            this[index].Dispose();
+        }
+
+        protected override void SetItem(int index, SceneNode item)
+        {
+            SceneNode oldItem = this[index];
+            item.Parent = _parent;
+            base.SetItem(index, item);
+            OnCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, item, oldItem, index));
+        }
+
+        #region INotifyCollectionChanged
+
+        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+
+        protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            CollectionChanged?.Invoke(this, e);
+        }
+
+        #endregion
+    }
+
+    public class SceneNode : ITransformable, IDisposable, INotifyPropertyChanged
+    {
+        private SceneNodeList _children;
         private string _name = "New Node";
 
         [Property("(Name)")]
@@ -33,9 +90,26 @@ namespace ToktersPlayground.Controls.SceneGraph
 
         public string Type => this.GetType().Name;
 
+        public SceneNode()
+        {
+            _children = new SceneNodeList(this);
+        }
+
+
         #region Scene Graph
 
         private SceneNode _parent = null!;
+
+        public SceneNodeList Children => _children;
+
+        public SceneNode this[int index] => _children[index];
+
+        public int Count => _children.Count;
+
+        public void Add(SceneNode node)
+        {
+            _children.Add(node);
+        }
 
         public SceneNode Parent
         {
@@ -57,40 +131,6 @@ namespace ToktersPlayground.Controls.SceneGraph
         }
 
 
-        protected override void InsertItem(int index, SceneNode item)
-        {
-            item.Parent = this;
-            base.InsertItem(index, item);
-            if (CollectionChanged != null)
-            {
-                CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
-            }
-        }
-
-        protected override void ClearItems()
-        {
-            for (int i = 0; i < Count; i++)
-            {
-                this[i].Dispose();
-            }
-            base.ClearItems();
-        }
-
-        protected override void RemoveItem(int index)
-        {
-            if (CollectionChanged != null)
-            {
-                CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, this[index], index));
-            }
-            this[index].Dispose();
-            base.RemoveItem(index);
-        }
-
-        protected override void SetItem(int index, SceneNode item)
-        {
-            item.Parent = this;
-            base.SetItem(index, item);
-        }
 
         protected virtual void Dispose(bool disposing)
         {
@@ -99,14 +139,14 @@ namespace ToktersPlayground.Controls.SceneGraph
         public void Dispose()
         {
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Clear();
+            _children.Clear();
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
 
         public IEnumerable<SceneNode> FindNodes(Predicate<SceneNode> predicate)
         {
-            foreach (var child in this)
+            foreach (var child in _children)
             {
                 var nodes = child.FindNodes(predicate);
                 foreach (var node in nodes) yield return node;
@@ -147,6 +187,7 @@ namespace ToktersPlayground.Controls.SceneGraph
             }
         }
 
+        [Property("Position")]
         public Vector2 Position
         {
             get => _position;
@@ -156,16 +197,24 @@ namespace ToktersPlayground.Controls.SceneGraph
                 {
                     _position = value;
                     MarkTransformDirty();
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(AbsPosition));
                 }
             }
         }
 
+        [Property("Abs Position")]
         public Vector2 AbsPosition
         {
             get => ToAbs(Vector2.Zero);
-            set => Position = Parent.ToLocal(value);
+            set
+            {
+                Position = Parent.ToLocal(value);
+                OnPropertyChanged();
+            }
         }
 
+        [Property("Scale")]
         public float Scale
         {
             get => _scale;
@@ -175,6 +224,7 @@ namespace ToktersPlayground.Controls.SceneGraph
                 {
                     _scale = value;
                     MarkTransformDirty();
+                    OnPropertyChanged();
                 }
             }
         }
@@ -254,7 +304,7 @@ namespace ToktersPlayground.Controls.SceneGraph
         public void MarkTransformDirty()
         {
             _isDirty = true;
-            foreach (var child in this) child.MarkTransformDirty();
+            foreach (var child in Children) child.MarkTransformDirty();
         }
 
         #endregion
@@ -276,13 +326,13 @@ namespace ToktersPlayground.Controls.SceneGraph
         public void SelectNone()
         {
             Selected = false;
-            foreach (var item in this) item.SelectNone();
+            foreach (var item in Children) item.SelectNone();
         }
 
         public void SelectAll()
         {
             Selected = true;
-            foreach (var item in this) item.SelectAll();
+            foreach (var item in Children) item.SelectAll();
         }
 
         //Override to intercept selection
@@ -292,9 +342,7 @@ namespace ToktersPlayground.Controls.SceneGraph
 
         #endregion
 
-        #region INotifyCollectionChanged & INotifyPropertyChanged
-
-        public event NotifyCollectionChangedEventHandler? CollectionChanged;
+        #region INotifyPropertyChanged
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -322,6 +370,30 @@ namespace ToktersPlayground.Controls.SceneGraph
 
         public virtual void DrawUI(SKCanvas canvas, Camera camera)
         {
+        }
+
+        #endregion
+
+        #region Heler Functions
+
+        public bool IsInRect(Vector2 point, Vector2 rect1, Vector2 rect2)
+        {
+            var topLeft = rect1;
+            var bottomRight = rect2;
+            //Switch topLeft and bottomRight if needed
+            if (topLeft.X > bottomRight.X)
+            {
+                var temp = topLeft.X;
+                topLeft.X = bottomRight.X;
+                bottomRight.X = temp;
+            }
+            if (topLeft.Y > bottomRight.Y)
+            {
+                var temp = topLeft.Y;
+                topLeft.Y = bottomRight.Y;
+                bottomRight.Y = temp;
+            }
+            return topLeft.X < point.X && bottomRight.X > point.X && topLeft.Y < point.Y && bottomRight.Y > point.Y;
         }
 
         #endregion

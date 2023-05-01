@@ -43,7 +43,6 @@ namespace ToktersPlayground.Controls
         {
             _scene.SetScreenSize((float)Bounds.Width, (float)Bounds.Height);
             context.Custom(new DrawOp(new Rect(0, 0, Bounds.Width, Bounds.Height), _scene));
-
             Dispatcher.UIThread.InvokeAsync(InvalidateVisual, DispatcherPriority.Background);
         }
 

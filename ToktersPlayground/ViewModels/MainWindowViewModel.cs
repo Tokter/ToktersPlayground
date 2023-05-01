@@ -81,9 +81,9 @@ namespace ToktersPlayground.ViewModels
             }
         }
 
-        public SceneNode? Nodes
+        public SceneNodeList? Nodes
         {
-            get => _selectedComponent?.Sketch?.Scene.Root;
+            get => _selectedComponent?.Sketch?.Scene.Root.Children;
         }
         
         private SceneNode? _selectedNode;

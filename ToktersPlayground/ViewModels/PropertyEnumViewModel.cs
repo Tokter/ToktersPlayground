@@ -48,6 +48,11 @@ namespace ToktersPlayground.ViewModels
             if (EnumType == null) return;
             Values.Clear();
             Values.AddRange(Enum.GetNames(EnumType));
-        }   
+        }
+
+        public override void Update()
+        {
+            this.RaisePropertyChanged(nameof(SelectedValue));
+        }
     }
 }

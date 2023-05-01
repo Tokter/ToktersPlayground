@@ -39,7 +39,7 @@ namespace ToktersPlayground.Controls.SceneGraph.EditStates
         /// <summary>
         /// Gets called before the edit state gets activated
         /// </summary>
-        public virtual void Activated()
+        public virtual void Activated(object? parameter = null)
         {
         }
 

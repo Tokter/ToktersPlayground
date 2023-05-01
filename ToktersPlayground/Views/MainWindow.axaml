@@ -42,14 +42,14 @@
 		<DockPanel DockPanel.Dock="Top">
 			<Path DockPanel.Dock="Left" Fill="Orange" Margin="2" Data="{StaticResource Tools}" />
 			<Label DockPanel.Dock="Left" Content="Tokter's Playgound" Foreground="Orange" VerticalContentAlignment="Center" FontWeight="Bold" />
-      <Menu DockPanel.Dock="Left" Items="{Binding MainMenu}" VerticalAlignment="Center" />       
-      <Menu DockPanel.Dock="Left" Items="{Binding ComponentsMenu}" VerticalAlignment="Center" />
+      <Menu DockPanel.Dock="Left" ItemsSource="{Binding MainMenu}" VerticalAlignment="Center" />       
+      <Menu DockPanel.Dock="Left" ItemsSource="{Binding ComponentsMenu}" VerticalAlignment="Center" />
       <Panel />
 		</DockPanel>
 
     <Grid ColumnDefinitions="*, 4, 250">
       <DockPanel Grid.Column="0">
-        <ItemsControl DockPanel.Dock="Top" Items="{Binding ComponentTools}" Height="30" Background="Transparent">
+        <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding ComponentTools}" Height="30" Background="Transparent">
           <ItemsControl.ItemTemplate>
             <DataTemplate>
               <Button Command="{Binding Command}" CommandParameter="{Binding Component}" ToolTip.Tip="{Binding Name}" Margin="4">
@@ -73,7 +73,7 @@
         <DockPanel Grid.Row="0">
           <TabControl DockPanel.Dock="Top" SelectedIndex="{Binding SelectedTab}">
             <TabItem Header="Components">
-              <ListBox Items="{Binding Components}" SelectedItem="{Binding SelectedComponent}">
+              <ListBox ItemsSource="{Binding Components}" SelectedItem="{Binding SelectedComponent}">
                 <ListBox.ItemTemplate>
                   <DataTemplate>
                     <DockPanel>
@@ -86,17 +86,14 @@
 
             </TabItem>
             <TabItem Header="Scene Graph">
-              <TreeView Items="{Binding Nodes}" SelectedItem="{Binding SelectedNode}">
+              <TreeView ItemsSource="{Binding Nodes}" SelectedItem="{Binding SelectedNode}">
                 <TreeView.DataTemplates>
-                  <TreeDataTemplate DataType="nodes:SceneNode" ItemsSource="{Binding .}">
+                  <TreeDataTemplate DataType="nodes:SceneNode" ItemsSource="{Binding Children}">
                     <DockPanel>
                       <Label DockPanel.Dock="Right" Content="{Binding Type}" Foreground="{DynamicResource ThemeControlHighBrush}" VerticalContentAlignment="Center" />
                       <Label Content="{Binding Name}" />
                     </DockPanel>
                   </TreeDataTemplate>
-                  <DataTemplate DataType="nodes:SceneNode">
-                    <TextBlock Text="{Binding Type}" />
-                  </DataTemplate>
                 </TreeView.DataTemplates>
               </TreeView>
             </TabItem>

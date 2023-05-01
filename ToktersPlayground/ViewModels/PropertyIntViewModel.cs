@@ -7,17 +7,15 @@ using System.Threading.Tasks;
 
 namespace ToktersPlayground.ViewModels
 {
-    public class PropertyFloatViewModel : PropertyBase
+    public class PropertyIntViewModel : PropertyBase
     {
-        public string StringFormat { get; set; } = string.Empty;
-
-        public PropertyFloatViewModel(PropertyEditorViewModel propertyEditor, PropertyDetail details) : base(propertyEditor, details)
+        public PropertyIntViewModel(PropertyEditorViewModel propertyEditor, PropertyDetail details) : base(propertyEditor, details)
         {
         }
 
-        public float Value
+        public int Value
         {
-            get => (float)Editor.GetValue(Details, 0.0f);
+            get => (int)Editor.GetValue(Details, 0);
             set
             {
                 Editor.SetValue(Details, value);
@@ -31,18 +29,11 @@ namespace ToktersPlayground.ViewModels
             get
             {
                 if (_valueText != null) return _valueText;
-                if (!string.IsNullOrEmpty(StringFormat))
-                {
-                    return Value.ToString(StringFormat);
-                }
-                else
-                {
-                    return Value.ToString();
-                }
+                return Value.ToString();
             }
             set
             {
-                if (float.TryParse(value, out float result))
+                if (int.TryParse(value, out int result))
                 {
                     Value = result;
                     _valueText = null;
@@ -51,7 +42,7 @@ namespace ToktersPlayground.ViewModels
                 else
                 {
                     _valueText = value;
-                    SetError($"{_valueText} is not a valid float!");
+                    SetError($"{_valueText} is not a valid int!");
                 }
                 this.RaisePropertyChanged();
             }

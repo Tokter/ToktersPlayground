@@ -16,7 +16,7 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
         AttachmentPoint,
     }
 
-    public class VertexNode : SceneNode, IDragable
+    public class VertexNode : SceneNode, IDraggable
     {
         private SKPaint _vertexPaint;
         private const float VertexSize = 4.0f;
@@ -82,30 +82,15 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
             base.Dispose(disposing);
         }
 
+        public bool CanBeDragged => true;
+        public bool CanBeSelected => true;
+
         public bool IntersectsWidth(Vector2 pos)
         {
             var localPos = ToLocal(pos);
             return Vector2.Distance(Vector2.Zero, localPos) < 4.0f;
         }
 
-        public bool InRect(Vector2 rect1, Vector2 rect2)
-        {
-            var topLeft = ToLocal(rect1);
-            var bottomRight = ToLocal(rect2);
-            //Switch topLeft and bottomRight if needed
-            if (topLeft.X > bottomRight.X)
-            {
-                var temp = topLeft.X;
-                topLeft.X = bottomRight.X;
-                bottomRight.X = temp;
-            }
-            if (topLeft.Y > bottomRight.Y)
-            {
-                var temp = topLeft.Y;
-                topLeft.Y = bottomRight.Y;
-                bottomRight.Y = temp;
-            }
-            return topLeft.X < 0 && bottomRight.X > 0 && topLeft.Y < 0 && bottomRight.Y > 0;
-        }
+        public bool InRect(Vector2 rect1, Vector2 rect2) => IsInRect(Vector2.Zero, ToLocal(rect1), ToLocal(rect2));
     }
 }

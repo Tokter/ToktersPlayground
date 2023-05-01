@@ -21,17 +21,16 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
             Description = "Insert Vertex";
         }
 
-        public override void Activated()
+        public override void Activated(object? parameter = null)
         {
             base.Activated();
             Scene.SetCursor(StandardCursorType.Cross);
-            _layoutNode = (ParagliderLayoutNode)Scene.Root.First(n => n is ParagliderLayoutNode);
+            _layoutNode = (ParagliderLayoutNode)Scene.Root.Children.First(n => n is ParagliderLayoutNode);
         }
 
         public override InspectResult InspectEvent(InputEvent inputEvent)
         {
-            //4 key pressed
-            if (Scene.ActiveState == null && inputEvent.InputEventType == InputEventType.KeyDown && inputEvent.Key == Key.I)
+            if (Scene.ActiveState == null && inputEvent.InputEventType == InputEventType.KeyDown && inputEvent.Key == Key.V)
             {
                 return InspectResult.ActivateMe;
             }
@@ -50,7 +49,7 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
                         case Key.Escape:
                             if (_vertex != null)
                             {
-                                _layoutNode.Remove(_vertex);
+                                _layoutNode.Children.Remove(_vertex);
                                 _vertex.Dispose();
                                 _vertex = null;
                             }
@@ -60,14 +59,10 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
 
                 case InputEventType.MouseDown:
                     _vertex = new VertexNode();
-                    _vertex.Name = "Vertex " + _layoutNode.Count(n => n is VertexNode);
+                    _vertex.Name = "Vertex " + _layoutNode.Children.Count(n => n is VertexNode);
                     _layoutNode.Add(_vertex);
                     _vertex.Selected = true;
-
                     _vertex.Position = Scene.Camera.ToWorld(inputEvent.MousePos);
-                    break;
-
-                case InputEventType.MouseUp:
                     _vertex = null;
                     return ProcessResult.ImDone;
             }

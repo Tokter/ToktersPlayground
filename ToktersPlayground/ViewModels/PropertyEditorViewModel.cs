@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using Tmds.DBus.SourceGenerator;
 using ToktersPlayground.Components;
 
 namespace ToktersPlayground.ViewModels
@@ -15,6 +16,7 @@ namespace ToktersPlayground.ViewModels
     public class PropertyEditorViewModel : ViewModelBase
     {
         private List<object> _selectedObjects = new List<object>();
+        private List<Subscription> _subscriptions = new List<Subscription>();
         private PropertyDetails _propertyDetails = new PropertyDetails();
         public ObservableCollection<PropertyBase> Properties { get; set; } = new ObservableCollection<PropertyBase>();
 
@@ -41,10 +43,19 @@ namespace ToktersPlayground.ViewModels
             BuildPropertyList();
         }
 
+        public void SubscribedPropertyChanged(string propertyName)
+        {
+            foreach (var p in Properties.Where(p => p.Details.Property.Name == propertyName))
+            {
+                p.Update();
+            }
+        }
+
         private void BuildPropertyList()
         {
             _propertyDetails.Clear();
             Properties.Clear();
+            ClearSubscriptions();
 
             foreach (var obj in _selectedObjects)
             {
@@ -60,6 +71,12 @@ namespace ToktersPlayground.ViewModels
                     }
                 }
                 _propertyDetails.Add(details);
+            }
+
+            foreach(var obj in _selectedObjects)
+            {
+                var sub = new Subscription(obj, _propertyDetails.Select(pd => pd.Property.Name), SubscribedPropertyChanged);
+                if (sub.Object != null) _subscriptions.Add(sub);
             }
 
             foreach (var pd in _propertyDetails.OrderBy(p=>p.Attribute.DisplayName))
@@ -82,10 +99,29 @@ namespace ToktersPlayground.ViewModels
                                 Properties.Add(floatProperty);
                                 break;
 
+                            case "Byte":
+                                var byteProperty = new PropertyByteViewModel(this, pd);
+                                byteProperty.Name = pd.Attribute.DisplayName ?? pd.Property.Name;
+                                Properties.Add(byteProperty);
+                                break;
+
+                            case "Int":
+                            case "Int32":
+                                var intProperty = new PropertyIntViewModel(this, pd);
+                                intProperty.Name = pd.Attribute.DisplayName ?? pd.Property.Name;
+                                Properties.Add(intProperty);
+                                break;
+
                             case "Boolean":
                                 var boolProperty = new PropertyBoolViewModel(this, pd);
                                 boolProperty.Name = pd.Attribute.DisplayName ?? pd.Property.Name;
                                 Properties.Add(boolProperty);
+                                break;
+
+                            case "Vector2":
+                                var vector2Property = new PropertyVector2ViewModel(this, pd);
+                                vector2Property.Name = pd.Attribute.DisplayName ?? pd.Property.Name;
+                                Properties.Add(vector2Property);
                                 break;
 
                             default:
@@ -134,6 +170,53 @@ namespace ToktersPlayground.ViewModels
             }
             return value ?? defaultValue;
         }
+
+        private void ClearSubscriptions()
+        {
+            foreach(var sub in _subscriptions)
+            {
+                sub.Unsubscribe();
+            }
+            _subscriptions.Clear();
+        }
+    }
+
+    public class Subscription
+    {
+        public HashSet<string> Properties { get; set; } = new HashSet<string>();
+        public object? Object { get; set; }
+        public Action<string>? Action { get; set; }
+
+        public Subscription(object obj, IEnumerable<string> properties, Action<string> action)
+        {
+            if (obj is INotifyPropertyChanged notifyPropertyChanged)
+            {
+                Object = obj;
+                foreach(var p in properties)
+                {
+                    Properties.Add(p);
+                }
+                Action = action;
+
+                notifyPropertyChanged.PropertyChanged += PropertyChanged;
+            }
+        }
+
+        public void Unsubscribe()
+        {
+            if (Object is INotifyPropertyChanged notifyPropertyChanged)
+            {
+                notifyPropertyChanged.PropertyChanged -= PropertyChanged;
+            }
+        }
+
+        public void PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName != null && Properties.Contains(e.PropertyName))
+            {
+                if (Action != null) Action(e.PropertyName);
+            }
+        }       
     }
 
     public class PropertyDetail

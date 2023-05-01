@@ -17,7 +17,9 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
 
         public ParagliderLayoutNode()
         {
+            Name = "Paraglider Layout";
             _symmetryPaint = new SKPaint();
+            _symmetryPaint.Style = SKPaintStyle.Stroke;
             _symmetryPaint.Color = SKColors.White;
             _symmetryPaint.StrokeWidth = 1.0f;
             _symmetryPaint.IsAntialias = true;
@@ -27,14 +29,16 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
         {
             if (Layout != null)
             {
-                DrawSymmetryAxis(canvas, camera);
-            }
-        }
+                var halfWidthCM = 100 * Layout.FlatSpan / 2.0f;
+                var chord = Layout.FlatSpan / Layout.FlatAspectRatio;
+                var halfHeightCM = 100 * chord / 2.0f;
 
-        private void DrawSymmetryAxis(SKCanvas canvas, Camera camera)
-        {
-            var x = 0.0f;
-            canvas.DrawLine(x, -100.0f, x, 100.0f, _symmetryPaint);
+                //Draw Symmetry Axis
+                canvas.DrawLine(0, -2 * halfHeightCM, 0, 2 * halfHeightCM, _symmetryPaint);
+
+                //Draw aspect ratio outline
+                canvas.DrawRect(-halfWidthCM, -halfHeightCM, 2 * halfWidthCM, 2 * halfHeightCM, _symmetryPaint);
+            }
         }
 
         protected override void Dispose(bool disposing)

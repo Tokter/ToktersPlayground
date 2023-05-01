@@ -96,9 +96,12 @@ namespace ToktersPlayground.Controls.SceneGraph
             SetModelTransform(node.GetTransform());
             camera.ApplyModelViewTransformToSurface(canvas, _modelTransform, _modelInvTransform);
             node.DrawScene(canvas, camera);
-            foreach (var child in node.Where(n => n.Visible))
+            for (int i = 0; i < node.Count; i++)
             {
-                DrawSceneNode(canvas, child, camera);
+                if (node[i].Visible)
+                {
+                    DrawSceneNode(canvas, node[i], camera);
+                }
             }
             PopModelTransform();
         }
@@ -141,14 +144,14 @@ namespace ToktersPlayground.Controls.SceneGraph
             }
         }
 
-        public void Activate(string name)
+        public void Activate(string name, object? parameter = null)
         {
             if (ActiveState == null)
             {
                 var newState = _availableStates.FirstOrDefault(s => s?.Name?.ToLower().Trim() == name.ToLower().Trim());
                 if (newState != null)
                 {
-                    newState.Activated();
+                    newState.Activated(parameter);
                     _activeState.Push(newState);
                 }
             }

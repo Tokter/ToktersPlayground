@@ -24,9 +24,11 @@ namespace ToktersPlayground.Controls.SceneGraph
     {
         bool IntersectsWidth(Vector2 pos);
         bool InRect(Vector2 rect1, Vector2 rect2);
+        bool CanBeSelected { get; }
     }
 
-    public interface IDragable : IIntersectable, ITransformable
+    public interface IDraggable : IIntersectable, ITransformable
     {
+        bool CanBeDragged { get; }
     }
 }

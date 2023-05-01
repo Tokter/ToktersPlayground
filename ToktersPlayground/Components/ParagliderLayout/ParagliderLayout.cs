@@ -20,8 +20,20 @@ namespace ToktersPlayground.Components.ParagliderLayout
             Type = "Paraglider Layout";
         }
 
-        [Property("Layout Image", EditorType = EditorType.FileLocation)]
-        public string LayoutImage { get; set; } = "";
+        [Property("Number of Cells")]
+        public int NumberOfCells { get; set; } = 51;
+
+        [Property("Flat Span (m)")]
+        public float FlatSpan { get; set; } = 12.7f;
+
+        [Property("Flat Aspect Ratio")]
+        public float FlatAspectRatio { get; set; } = 5.4f;
+
+        [Property("Flat Area (m^2)")]
+        public float FlatArea { get; set; } = 29.8f;
+
+        [Property("Weight (kg)")]
+        public float Weight { get; set; } = 5.5f;
 
         protected override ViewModelBase CreateViewModel()
         {

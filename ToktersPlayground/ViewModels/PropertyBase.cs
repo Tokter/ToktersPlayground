@@ -49,5 +49,10 @@ namespace ToktersPlayground.ViewModels
             if (_errors.ContainsKey(propertyName)) _errors.Remove(propertyName);
             ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(propertyName));
         }
+
+        public virtual void Update()
+        {
+            throw new NotImplementedException(nameof(Update));
+        }
     }
 }

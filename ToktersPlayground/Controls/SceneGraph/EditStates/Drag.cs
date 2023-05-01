@@ -12,7 +12,7 @@ namespace ToktersPlayground.Controls.SceneGraph.EditStates
         private Vector2 _startMousePos;
         private List<SelectedNode> _selectedNodes = new List<SelectedNode>();
 
-        public override void Activated()
+        public override void Activated(object? parameter = null)
         {
             base.Activated();
             this.Scene.SetCursor(Avalonia.Input.StandardCursorType.Hand);
@@ -24,7 +24,11 @@ namespace ToktersPlayground.Controls.SceneGraph.EditStates
             if (Scene.ActiveState == null && inputEvent.InputEventType == InputEventType.MouseDown && inputEvent.Button == MouseButtons.Left)
             {
                 //do we click on a selectedNode?
-                var clickOnSelectedNode = Scene.Root.FindNodes(node => node is IDragable d && node.Selected && d.IntersectsWidth(Scene.CurrentAbsMousePos)).Count() > 0;
+                var clickOnSelectedNode = Scene.Root.FindNodes(node => 
+                    node is IDraggable d 
+                    && d.CanBeDragged
+                    && node.Selected
+                    && d.IntersectsWidth(Scene.CurrentAbsMousePos)).Count() > 0;
 
                 if (clickOnSelectedNode)
                 {
@@ -32,7 +36,7 @@ namespace ToktersPlayground.Controls.SceneGraph.EditStates
 
                     //Stored the selected nodes
                     _selectedNodes.Clear();
-                    foreach (IDragable node in Scene.Root.FindNodes(node => node is IDragable && node.Selected))
+                    foreach (IDraggable node in Scene.Root.FindNodes(node => node is IDraggable d && d.CanBeDragged && node.Selected))
                     {
                         _selectedNodes.Add(new SelectedNode(node));
                     }
@@ -65,9 +69,9 @@ namespace ToktersPlayground.Controls.SceneGraph.EditStates
 
         private class SelectedNode
         {
-            public IDragable Node { get; set; }
+            public IDraggable Node { get; set; }
             public Vector2 StartPosition { get; set; }
-            public SelectedNode(IDragable node)
+            public SelectedNode(IDraggable node)
             {
                 Node = node;
                 StartPosition = node.AbsPosition;

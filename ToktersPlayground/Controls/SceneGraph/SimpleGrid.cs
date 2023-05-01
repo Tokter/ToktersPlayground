@@ -21,6 +21,7 @@ namespace ToktersPlayground.Controls.SceneGraph
 
         public SimpleGrid()
         {
+            Name = "Grid";
             _originColor = new SKColor(0x60, 0x60, 0x60, 255);
             _originPaint = CreatePaint(_originColor);
 
