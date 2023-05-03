@@ -90,6 +90,10 @@
                 <TreeView.DataTemplates>
                   <TreeDataTemplate DataType="nodes:SceneNode" ItemsSource="{Binding Children}">
                     <DockPanel>
+                      <CheckBox DockPanel.Dock="Left" IsChecked="{Binding Selected}" />
+                      <Button  DockPanel.Dock="Left" Command="{Binding ToggleVisibility}" Background="Transparent" BorderBrush="Transparent">
+                        <PathIcon Data="{Binding VisibleIcon}" Width="14" Height="14" />
+                      </Button>
                       <Label DockPanel.Dock="Right" Content="{Binding Type}" Foreground="{DynamicResource ThemeControlHighBrush}" VerticalContentAlignment="Center" />
                       <Label Content="{Binding Name}" />
                     </DockPanel>

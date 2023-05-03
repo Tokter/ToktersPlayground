@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using ToktersPlayground.Components.LiftDragCurve.ViewModels;
 using ToktersPlayground.Components.ParagliderLayout.SceneGraph;
 using ToktersPlayground.Components.ParagliderLayout.ViewModels;
@@ -10,7 +11,7 @@ using ToktersPlayground.ViewModels;
 
 namespace ToktersPlayground.Components.ParagliderLayout
 {
-    public class ParagliderLayout : PlaygroundComponent
+    public class ParagliderLayout : PlaygroundComponent, ICanBeLoadedSaved
     {
         public ParagliderLayoutControl? LayoutControl => this.Sketch as ParagliderLayoutControl;
 
@@ -39,5 +40,38 @@ namespace ToktersPlayground.Components.ParagliderLayout
         {
             return new ParagliderLayoutViewModel(this);
         }
+
+        #region ICanBeLoadedSaved
+
+        public void SaveTo(XmlWriter writer)
+        {
+            writer.WriteAttributeString("NumberOfCells", NumberOfCells.ToString());
+            writer.WriteAttributeString("FlatSpan", FlatSpan.ToString());
+            writer.WriteAttributeString("FlatAspectRatio", FlatAspectRatio.ToString());
+            writer.WriteAttributeString("FlatArea", FlatArea.ToString());
+            writer.WriteAttributeString("Weight", Weight.ToString());
+
+            if (LayoutControl != null)
+            {
+                foreach (var node in LayoutControl.Scene.Root.Children)
+                {
+                    if (node is ICanBeLoadedSaved loadSave)
+                    {
+                        loadSave.SaveTo(writer);
+                    }
+                }
+            }
+        }
+
+        public void LoadFrom(XmlElement element)
+        {
+            NumberOfCells = int.Parse(element.GetAttribute("NumberOfCells"));
+            FlatSpan = float.Parse(element.GetAttribute("FlatSpan"));
+            FlatAspectRatio = float.Parse(element.GetAttribute("FlatAspectRatio"));
+            FlatArea = float.Parse(element.GetAttribute("FlatArea"));
+            Weight = float.Parse(element.GetAttribute("Weight"));
+        }
+
+        #endregion
     }
 }

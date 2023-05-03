@@ -1,4 +1,5 @@
-﻿using SkiaSharp;
+﻿using DynamicData;
+using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,15 +7,17 @@ using System.Numerics;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using ToktersPlayground.Components;
 
 namespace ToktersPlayground.Controls.SceneGraph
 {
-    public class ImageNode : SceneNode, IDraggable
+    public class ImageNode : SceneNode, IDraggable, ICanBeLoadedSaved
     {
         private SKPaint _selectedPaint;
         private SKPaint _imagePaint;
         private SKBitmap? _bitmap = null;
+        private string _fileName = "";
 
         [Property("Is Locked")]
         public bool IsLocked { get; set; } = false;
@@ -41,6 +44,7 @@ namespace ToktersPlayground.Controls.SceneGraph
 
         public void LoadFromFile(string fileName, bool makeBackgroundTransparent = false)
         {
+            _fileName = fileName;
             _bitmap = SKBitmap.Decode(fileName);
 
             if (makeBackgroundTransparent)
@@ -107,5 +111,13 @@ namespace ToktersPlayground.Controls.SceneGraph
                 _selectedPaint.Dispose();
             }
         }
+
+        protected override void OnSave(XmlWriter writer)
+        {
+            writer.WriteAttributeString("FileName", _fileName.ToString());
+            writer.WriteAttributeString("Alpha", Alpha.ToString());
+            writer.WriteAttributeString("IsLocked", IsLocked.ToString());
+        }
+
     }
 }

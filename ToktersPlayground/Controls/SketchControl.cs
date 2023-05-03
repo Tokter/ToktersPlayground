@@ -76,6 +76,7 @@ namespace ToktersPlayground.Controls
         {
             if (_scene != null)
             {
+                if (this.IsFocused == false) this.Focus();
                 var point = e.GetCurrentPoint(this);
 
                 var inputEvent = InputEvent.MouseMove((float)point.Position.X, (float)point.Position.Y, ToButton(point.Properties),
