@@ -2,11 +2,13 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Rendering.SceneGraph;
 using Avalonia.Skia;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using SkiaSharp;
 using System;
 using System.Collections.Generic;
@@ -22,6 +24,7 @@ namespace ToktersPlayground.Controls
     {
         private Scene _scene;
         private bool disposedValue;
+        private float _desktopScaling = 1.0f;
 
         public Scene Scene => _scene;
         public bool AutoRedraw { get; set; } = false;
@@ -39,10 +42,16 @@ namespace ToktersPlayground.Controls
             KeyUp += DemoControl_KeyUp;
         }
 
-        public override void Render(DrawingContext context)
+        protected override void OnLoaded(RoutedEventArgs e)
         {
-            _scene.SetScreenSize((float)Bounds.Width, (float)Bounds.Height);
-            context.Custom(new DrawOp(new Rect(0, 0, Bounds.Width, Bounds.Height), _scene));
+            var test = this.GetVisualRoot();
+            _desktopScaling = (float)((test as Window)?.DesktopScaling ?? 1.0d);
+        }
+
+        public override void Render(DrawingContext context)
+        {   
+            _scene.SetScreenSize((float)Bounds.Width * _desktopScaling, (float)Bounds.Height * _desktopScaling);
+            context.Custom(new DrawOp(new Rect(0, 0, Bounds.Width * _desktopScaling, Bounds.Height * _desktopScaling), _scene));
             Dispatcher.UIThread.InvokeAsync(InvalidateVisual, DispatcherPriority.Background);
         }
 
@@ -79,7 +88,7 @@ namespace ToktersPlayground.Controls
                 if (this.IsFocused == false) this.Focus();
                 var point = e.GetCurrentPoint(this);
 
-                var inputEvent = InputEvent.MouseMove((float)point.Position.X, (float)point.Position.Y, ToButton(point.Properties),
+                var inputEvent = InputEvent.MouseMove((float)point.Position.X * _desktopScaling, (float)point.Position.Y * _desktopScaling, ToButton(point.Properties),
                     e.KeyModifiers.HasFlag(KeyModifiers.Shift),
                     e.KeyModifiers.HasFlag(KeyModifiers.Control),
                     e.KeyModifiers.HasFlag(KeyModifiers.Alt));
@@ -93,7 +102,7 @@ namespace ToktersPlayground.Controls
             {
                 var point = e.GetCurrentPoint(this);
 
-                var inputEvent = InputEvent.MouseUp((float)point.Position.X, (float)point.Position.Y, ToButton(e.InitialPressMouseButton),
+                var inputEvent = InputEvent.MouseUp((float)point.Position.X * _desktopScaling, (float)point.Position.Y * _desktopScaling, ToButton(e.InitialPressMouseButton),
                     e.KeyModifiers.HasFlag(KeyModifiers.Shift),
                     e.KeyModifiers.HasFlag(KeyModifiers.Control),
                     e.KeyModifiers.HasFlag(KeyModifiers.Alt));
@@ -107,7 +116,7 @@ namespace ToktersPlayground.Controls
             {
                 var point = e.GetCurrentPoint(this);
 
-                var inputEvent = InputEvent.MouseDown((float)point.Position.X, (float)point.Position.Y, ToButton(point.Properties),
+                var inputEvent = InputEvent.MouseDown((float)point.Position.X * _desktopScaling, (float)point.Position.Y * _desktopScaling, ToButton(point.Properties),
                     e.KeyModifiers.HasFlag(KeyModifiers.Shift),
                     e.KeyModifiers.HasFlag(KeyModifiers.Control),
                     e.KeyModifiers.HasFlag(KeyModifiers.Alt));
@@ -119,8 +128,6 @@ namespace ToktersPlayground.Controls
         {
             if (_scene != null)
             {
-                var point = e.GetCurrentPoint(this);
-
                 var inputEvent = InputEvent.MouseWheel((float)e.Delta.Y,
                     e.KeyModifiers.HasFlag(KeyModifiers.Shift),
                     e.KeyModifiers.HasFlag(KeyModifiers.Control),
@@ -205,13 +212,14 @@ namespace ToktersPlayground.Controls
             return true;
         }
 
-        public void Render(IDrawingContextImpl context)
+        public void Render(ImmediateDrawingContext context)
         {
-            var skia = context.GetFeature<ISkiaSharpApiLeaseFeature>();
-            if (skia != null)
+            var leaseFeature = context.TryGetFeature<ISkiaSharpApiLeaseFeature>();
+            if (leaseFeature != null)
             {
-                using (var lease = skia.Lease())
+                using (var lease = leaseFeature.Lease())
                 {
+                    lease.SkCanvas.ClipRect(Bounds.ToSKRect());
                     _scene.Draw(lease.SkCanvas);
                 }
             }

@@ -82,6 +82,8 @@ namespace ToktersPlayground.Controls.SceneGraph
 
             //Draw in screen space
             canvas.Save();
+
+            UICamera.ApplyModelViewTransformToSurface(canvas, Matrix3x2.Identity, Matrix3x2.Identity);
             DrawUISceneNode(canvas, Root, Camera);
             if (!string.IsNullOrEmpty(ActiveState?.Description))
             {

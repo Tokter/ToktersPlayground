@@ -14,6 +14,6 @@
     </Grid.RowDefinitions>
 
     <TextBlock Grid.Column="0" Grid.Row="0" Text="{Binding Name}" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,2,0" />
-    <ComboBox Grid.Column="1" Grid.Row="0" Items="{Binding Values}" SelectedValue="{Binding SelectedValue}" />
+    <ComboBox Grid.Column="1" Grid.Row="0" ItemsSource="{Binding Values}" SelectedValue="{Binding SelectedValue}" />
   </Grid>
 </UserControl>
