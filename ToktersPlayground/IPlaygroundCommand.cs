@@ -1,10 +1,8 @@
 ﻿using Avalonia.Platform.Storage;
-using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Reactive;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -83,8 +81,8 @@ namespace ToktersPlayground
 
     public class RelayCommand : ICommand
     {
-        private Func<object?, bool> _canExecute;
-        private Action<object?> _execute;
+        private readonly Func<object?, bool> _canExecute;
+        private readonly Action<object?> _execute;
 
         public event EventHandler? CanExecuteChanged;
 

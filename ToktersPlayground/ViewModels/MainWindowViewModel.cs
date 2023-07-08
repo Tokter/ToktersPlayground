@@ -1,7 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
-using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -26,7 +25,7 @@ namespace ToktersPlayground.ViewModels
 
     public class MainWindowViewModel : ViewModelBase, IPlayground
     {
-        public string Greeting => "Welcome to Avalonia!";
+        public static string Greeting => "Welcome to Avalonia!";
         public IList<MenuViewModel>? MainMenu { get; set; }
         public IList<MenuViewModel>? ComponentsMenu { get; set; }
         public IList<MenuViewModel>? ComponentTools { get; set; }
@@ -118,8 +117,7 @@ namespace ToktersPlayground.ViewModels
             {
                 if (t.GetCustomAttribute<PlaygroundComponentAttribute>()?.Type == type)
                 {
-                    var component = Activator.CreateInstance(t) as IPlaygroundComponent;
-                    if (component != null)
+                    if (Activator.CreateInstance(t) is IPlaygroundComponent component)
                     {
                         Components.Add(component);
                         SelectedComponent = component;
@@ -137,17 +135,15 @@ namespace ToktersPlayground.ViewModels
 
         private MenuViewModel BuildMenuItems(PlaygroundCommandLocation location, Type? componentType = null)
         {
-            MenuViewModel root = new MenuViewModel(this);
+            MenuViewModel root = new(this);
             var type = typeof(IPlaygroundCommand);
             var commands = AppDomain.CurrentDomain.GetAssemblies().SelectMany(s => s.GetTypes()).Where(p => type.IsAssignableFrom(p));
 
             foreach (var command in commands)
             {
-                var attribute = command.GetCustomAttributes(typeof(PlaygroundCommandAttribute), false).FirstOrDefault() as PlaygroundCommandAttribute;
-                if (attribute != null && attribute.Location == location && (attribute.ComponentType==null || attribute.ComponentType==componentType))
+                if (command.GetCustomAttributes(typeof(PlaygroundCommandAttribute), false).FirstOrDefault() is PlaygroundCommandAttribute attribute && attribute.Location == location && (attribute.ComponentType == null || attribute.ComponentType == componentType))
                 {
-                    var commandInstance = Activator.CreateInstance(command) as IPlaygroundCommand;
-                    if (commandInstance != null)
+                    if (Activator.CreateInstance(command) is IPlaygroundCommand commandInstance)
                     {
                         var menuItem = new MenuViewModel(this)
                         {
@@ -173,7 +169,7 @@ namespace ToktersPlayground.ViewModels
                             if (i == parts.Length - 1)
                             {
                                 menuItem.Name = parts[i];
-                                if (current.Items == null) current.Items = new List<MenuViewModel>();
+                                current.Items ??= new List<MenuViewModel>();
                                 var insertIndex = current.Items?.TakeWhile(p => p.Order < menuItem.Order).Count() ?? 0;
                                 current.Items?.Insert(insertIndex, menuItem);
                             }
@@ -182,11 +178,13 @@ namespace ToktersPlayground.ViewModels
                                 var parent = current.Items?.FirstOrDefault(p => p.Name == parts[i]);
                                 if (parent == null)
                                 {
-                                    parent = new MenuViewModel(this);
-                                    parent.Name = parts[i];
-                                    parent.Order = menuItem.Order;
+                                    parent = new MenuViewModel(this)
+                                    {
+                                        Name = parts[i],
+                                        Order = menuItem.Order
+                                    };
                                     var insertIndex = current.Items?.TakeWhile(p => p.Order < menuItem.Order).Count() ?? 0;
-                                    if (current.Items == null) current.Items = new List<MenuViewModel>();
+                                    current.Items ??= new List<MenuViewModel>();
                                     current.Items.Insert(insertIndex, parent);
                                 }
                                 current = parent!;

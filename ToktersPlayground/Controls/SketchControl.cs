@@ -22,7 +22,7 @@ namespace ToktersPlayground.Controls
 {
     public class SketchControl : Control, IDisposable
     {
-        private Scene _scene;
+        private readonly Scene _scene;
         private bool disposedValue;
         private float _desktopScaling = 1.0f;
 
@@ -136,7 +136,7 @@ namespace ToktersPlayground.Controls
             }
         }
 
-        private MouseButtons ToButton(PointerPointProperties prop)
+        private static MouseButtons ToButton(PointerPointProperties prop)
         {
             var result = MouseButtons.None;
 
@@ -149,17 +149,17 @@ namespace ToktersPlayground.Controls
             return result;
         }
 
-        private MouseButtons ToButton(MouseButton button)
+        private static MouseButtons ToButton(MouseButton button)
         {
-            switch(button)
+            return button switch
             {
-                case MouseButton.Left: return MouseButtons.Left;
-                case MouseButton.Right: return MouseButtons.Right;
-                case MouseButton.Middle: return MouseButtons.Middle;
-                case MouseButton.XButton1: return MouseButtons.XButton1;
-                case MouseButton.XButton2: return MouseButtons.XButton2;
-                default: return MouseButtons.None;
-            }
+                MouseButton.Left => MouseButtons.Left,
+                MouseButton.Right => MouseButtons.Right,
+                MouseButton.Middle => MouseButtons.Middle,
+                MouseButton.XButton1 => MouseButtons.XButton1,
+                MouseButton.XButton2 => MouseButtons.XButton2,
+                _ => MouseButtons.None,
+            };
         }
 
         #endregion
@@ -189,7 +189,7 @@ namespace ToktersPlayground.Controls
 
     public class DrawOp : ICustomDrawOperation
     {
-        private Scene _scene;
+        private readonly Scene _scene;
         public Rect Bounds { get; }
 
         public DrawOp(Rect bounds, SceneGraph.Scene scene)
@@ -200,6 +200,15 @@ namespace ToktersPlayground.Controls
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+            }
         }
 
         public bool Equals(ICustomDrawOperation? other)
@@ -217,11 +226,9 @@ namespace ToktersPlayground.Controls
             var leaseFeature = context.TryGetFeature<ISkiaSharpApiLeaseFeature>();
             if (leaseFeature != null)
             {
-                using (var lease = leaseFeature.Lease())
-                {
-                    lease.SkCanvas.ClipRect(Bounds.ToSKRect());
-                    _scene.Draw(lease.SkCanvas);
-                }
+                using var lease = leaseFeature.Lease();
+                lease.SkCanvas.ClipRect(Bounds.ToSKRect());
+                _scene.Draw(lease.SkCanvas);
             }
         }
     }

@@ -10,7 +10,7 @@ namespace ToktersPlayground.Controls.SceneGraph.EditStates
     public class Drag : EditState
     {
         private Vector2 _startMousePos;
-        private List<SelectedNode> _selectedNodes = new List<SelectedNode>();
+        private readonly List<SelectedNode> _selectedNodes = new();
 
         public override void Activated(object? parameter = null)
         {
@@ -35,11 +35,11 @@ namespace ToktersPlayground.Controls.SceneGraph.EditStates
             else if (Scene.ActiveState == null && inputEvent.InputEventType == InputEventType.MouseDown && inputEvent.Button == MouseButtons.Left)
             {
                 //do we click on a selectedNode?
-                var clickOnSelectedNode = Scene.Root.FindNodes(node => 
-                    node is IDraggable d 
+                var clickOnSelectedNode = Scene.Root.FindNodes(node =>
+                    node is IDraggable d
                     && d.CanBeDragged
                     && node.Selected
-                    && d.IntersectsWidth(Scene.CurrentAbsMousePos)).Count() > 0;
+                    && d.IntersectsWidth(Scene.CurrentAbsMousePos)).Any();
 
                 if (clickOnSelectedNode)
                 {
@@ -53,7 +53,7 @@ namespace ToktersPlayground.Controls.SceneGraph.EditStates
 
                 //Stored the selected nodes
                 _selectedNodes.Clear();
-                foreach (IDraggable node in Scene.Root.FindNodes(node => node is IDraggable d && d.CanBeDragged && node.Selected))
+                foreach (IDraggable node in Scene.Root.FindNodes(node => node is IDraggable d && d.CanBeDragged && node.Selected).Cast<IDraggable>())
                 {
                     _selectedNodes.Add(new SelectedNode(node));
                 }

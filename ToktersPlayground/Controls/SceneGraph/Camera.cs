@@ -11,12 +11,11 @@ namespace ToktersPlayground.Controls.SceneGraph
     public class Camera
     {
         private float _rotation = 0.0f;
-        private Vector2 _position = new Vector2(0, 0);
+        private Vector2 _position = new(0, 0);
         private float _scale = 1.0f;
         private bool _viewTransformIsDirty = true;
 
         private Matrix3x2 _modelViewtransform;
-        private Matrix3x2 _modelViewInvTransform;
 
         private Matrix3x2 _viewTransform;
         private Matrix3x2 _viewInvTransform;
@@ -89,7 +88,7 @@ namespace ToktersPlayground.Controls.SceneGraph
             }
         }
 
-        public void ApplyModelViewTransformToSurface(SKCanvas canvas, Matrix3x2 modelTransform, Matrix3x2 invModelTransform)
+        public void ApplyModelViewTransformToSurface(SKCanvas canvas, Matrix3x2 modelTransform)
         {
             if (_viewTransformIsDirty)
             {
@@ -101,7 +100,6 @@ namespace ToktersPlayground.Controls.SceneGraph
             var deviceClip = canvas.DeviceClipBounds;
 
             _modelViewtransform = modelTransform * _viewTransform * Matrix3x2.CreateTranslation(new Vector2(deviceClip.Left, deviceClip.Top));
-            _modelViewInvTransform = _viewInvTransform * invModelTransform;
             canvas.SetMatrix(new SKMatrix(_modelViewtransform.M11, _modelViewtransform.M21, _modelViewtransform.M31, _modelViewtransform.M12, _modelViewtransform.M22, _modelViewtransform.M32, 0, 0, 1));
         }
 

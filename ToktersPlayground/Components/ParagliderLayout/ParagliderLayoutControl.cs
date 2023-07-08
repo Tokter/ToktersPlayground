@@ -15,7 +15,7 @@ namespace ToktersPlayground.Components.ParagliderLayout
 {
     public class ParagliderLayoutControl : SketchControl
     {
-        private ParagliderLayoutNode _plNode;
+        private readonly ParagliderLayoutNode _plNode;
 
         public ParagliderLayoutControl()
         {

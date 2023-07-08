@@ -1,5 +1,4 @@
-﻿using DynamicData;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -15,9 +14,9 @@ namespace ToktersPlayground.ViewModels
 {
     public class PropertyEditorViewModel : ViewModelBase
     {
-        private List<object> _selectedObjects = new List<object>();
-        private List<Subscription> _subscriptions = new List<Subscription>();
-        private PropertyDetails _propertyDetails = new PropertyDetails();
+        private readonly List<object> _selectedObjects = new();
+        private readonly List<Subscription> _subscriptions = new();
+        private readonly PropertyDetails _propertyDetails = new();
         public ObservableCollection<PropertyBase> Properties { get; set; } = new ObservableCollection<PropertyBase>();
 
         public void SelectObjects(IEnumerable<object> objects)
@@ -64,8 +63,7 @@ namespace ToktersPlayground.ViewModels
                 var details = new List<PropertyDetail>();
                 foreach (var property in properties)
                 {
-                    var propertyAttribute = property.GetCustomAttributes(typeof(PropertyAttribute), false).FirstOrDefault() as PropertyAttribute;
-                    if (propertyAttribute != null)
+                    if (property.GetCustomAttributes(typeof(PropertyAttribute), false).FirstOrDefault() is PropertyAttribute propertyAttribute)
                     {
                         details.Add(new PropertyDetail(property, propertyAttribute));
                     }
@@ -87,40 +85,52 @@ namespace ToktersPlayground.ViewModels
                         switch (pd.Property.PropertyType.Name)
                         {
                             case "String":
-                                var stringProperty = new PropertyStringViewModel(this, pd);
-                                stringProperty.Name = pd.Attribute.DisplayName ?? pd.Property.Name;
+                                var stringProperty = new PropertyStringViewModel(this, pd)
+                                {
+                                    Name = pd.Attribute.DisplayName ?? pd.Property.Name
+                                };
                                 Properties.Add(stringProperty);
                                 break;
 
                             case "Single":
-                                var floatProperty = new PropertyFloatViewModel(this, pd);
-                                floatProperty.Name = pd.Attribute.DisplayName ?? pd.Property.Name;
-                                floatProperty.StringFormat = pd.Attribute.StringFormat;
+                                var floatProperty = new PropertyFloatViewModel(this, pd)
+                                {
+                                    Name = pd.Attribute.DisplayName ?? pd.Property.Name,
+                                    StringFormat = pd.Attribute.StringFormat
+                                };
                                 Properties.Add(floatProperty);
                                 break;
 
                             case "Byte":
-                                var byteProperty = new PropertyByteViewModel(this, pd);
-                                byteProperty.Name = pd.Attribute.DisplayName ?? pd.Property.Name;
+                                var byteProperty = new PropertyByteViewModel(this, pd)
+                                {
+                                    Name = pd.Attribute.DisplayName ?? pd.Property.Name
+                                };
                                 Properties.Add(byteProperty);
                                 break;
 
                             case "Int":
                             case "Int32":
-                                var intProperty = new PropertyIntViewModel(this, pd);
-                                intProperty.Name = pd.Attribute.DisplayName ?? pd.Property.Name;
+                                var intProperty = new PropertyIntViewModel(this, pd)
+                                {
+                                    Name = pd.Attribute.DisplayName ?? pd.Property.Name
+                                };
                                 Properties.Add(intProperty);
                                 break;
 
                             case "Boolean":
-                                var boolProperty = new PropertyBoolViewModel(this, pd);
-                                boolProperty.Name = pd.Attribute.DisplayName ?? pd.Property.Name;
+                                var boolProperty = new PropertyBoolViewModel(this, pd)
+                                {
+                                    Name = pd.Attribute.DisplayName ?? pd.Property.Name
+                                };
                                 Properties.Add(boolProperty);
                                 break;
 
                             case "Vector2":
-                                var vector2Property = new PropertyVector2ViewModel(this, pd);
-                                vector2Property.Name = pd.Attribute.DisplayName ?? pd.Property.Name;
+                                var vector2Property = new PropertyVector2ViewModel(this, pd)
+                                {
+                                    Name = pd.Attribute.DisplayName ?? pd.Property.Name
+                                };
                                 Properties.Add(vector2Property);
                                 break;
 
@@ -128,9 +138,11 @@ namespace ToktersPlayground.ViewModels
                                 switch (pd.Property.PropertyType.BaseType?.Name)
                                 {
                                     case "Enum":
-                                        var enumProperty = new PropertyEnumViewModel(this, pd);
-                                        enumProperty.Name = pd.Attribute.DisplayName ?? pd.Property.Name;
-                                        enumProperty.EnumType = pd.Property.PropertyType;
+                                        var enumProperty = new PropertyEnumViewModel(this, pd)
+                                        {
+                                            Name = pd.Attribute.DisplayName ?? pd.Property.Name,
+                                            EnumType = pd.Property.PropertyType
+                                        };
                                         Properties.Add(enumProperty);
                                         break;
                                 }
@@ -214,7 +226,7 @@ namespace ToktersPlayground.ViewModels
         {
             if (e.PropertyName != null && Properties.Contains(e.PropertyName))
             {
-                if (Action != null) Action(e.PropertyName);
+                Action?.Invoke(e.PropertyName);
             }
         }       
     }
@@ -277,6 +289,14 @@ namespace ToktersPlayground.ViewModels
                 {
                     Remove(item);
                 }
+            }
+        }
+
+        private void AddRange(IEnumerable<PropertyDetail> items)
+        {
+            foreach (var item in items)
+            {
+                Add(item);
             }
         }
     }

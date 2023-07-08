@@ -18,24 +18,28 @@ namespace ToktersPlayground.Controls.SceneGraph.EditStates
 
     public class Select : EditState, IDisposable
     {
-        private SKPaint _selectionPaintStroke;
-        private SKPaint _selectionPaintFill;
+        private readonly SKPaint _selectionPaintStroke;
+        private readonly SKPaint _selectionPaintFill;
         private SelectionMode _selectionMode = SelectionMode.Select;
         private Vector2 _startMousePos;
 
         public Select()
         {
-            _selectionPaintStroke = new SKPaint();
-            _selectionPaintStroke.Color = SKColors.Red;
-            _selectionPaintStroke.Style = SKPaintStyle.Stroke;
-            _selectionPaintStroke.StrokeWidth = 1.0f;
-            _selectionPaintStroke.IsAntialias = true;
+            _selectionPaintStroke = new SKPaint
+            {
+                Color = SKColors.Red,
+                Style = SKPaintStyle.Stroke,
+                StrokeWidth = 1.0f,
+                IsAntialias = true
+            };
 
-            _selectionPaintFill = new SKPaint();
-            _selectionPaintFill.Color = new SKColor(255, 0, 0, 10);
-            _selectionPaintFill.Style = SKPaintStyle.Fill;
-            _selectionPaintFill.StrokeWidth = 1.0f;
-            _selectionPaintFill.IsAntialias = true;
+            _selectionPaintFill = new SKPaint
+            {
+                Color = new SKColor(255, 0, 0, 10),
+                Style = SKPaintStyle.Fill,
+                StrokeWidth = 1.0f,
+                IsAntialias = true
+            };
         }
 
         public override InspectResult InspectEvent(InputEvent inputEvent)
@@ -158,7 +162,16 @@ namespace ToktersPlayground.Controls.SceneGraph.EditStates
 
         public void Dispose()
         {
-            _selectionPaintStroke.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _selectionPaintStroke.Dispose();
+            }
         }
     }
 }

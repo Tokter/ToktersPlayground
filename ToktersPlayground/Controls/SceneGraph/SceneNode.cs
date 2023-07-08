@@ -20,7 +20,7 @@ namespace ToktersPlayground.Controls.SceneGraph
 {
     public class SceneNodeList : Collection<SceneNode>, INotifyCollectionChanged
     {
-        private SceneNode _parent;
+        private readonly SceneNode _parent;
 
         public SceneNodeList(SceneNode parent)
         {
@@ -74,9 +74,9 @@ namespace ToktersPlayground.Controls.SceneGraph
 
     public class SceneNode : ITransformable, IDisposable, INotifyPropertyChanged, ICanBeLoadedSaved
     {
-        private static Geometry IsVisibleIcon = Geometry.Parse("M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z");
-        private static Geometry IsNotVisibleIcon = Geometry.Parse("M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.08L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.74,7.13 11.35,7 12,7Z");
-        private SceneNodeList _children;
+        private static readonly Geometry IsVisibleIcon = Geometry.Parse("M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z");
+        private static readonly Geometry IsNotVisibleIcon = Geometry.Parse("M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.08L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.74,7.13 11.35,7 12,7Z");
+        private readonly SceneNodeList _children;
         private string _name = "New Node";
 
         [Property("(Name)")]
@@ -173,7 +173,7 @@ namespace ToktersPlayground.Controls.SceneGraph
         #region ITransformable
 
         private float _rotation = 0.0f;
-        private Vector2 _position = new Vector2(0, 0);
+        private Vector2 _position = new(0, 0);
         private float _scale = 1.0f;
         private bool _isDirty = true;
 
@@ -391,22 +391,18 @@ namespace ToktersPlayground.Controls.SceneGraph
 
         #region Heler Functions
 
-        public bool IsInRect(Vector2 point, Vector2 rect1, Vector2 rect2)
+        public static bool IsInRect(Vector2 point, Vector2 rect1, Vector2 rect2)
         {
             var topLeft = rect1;
             var bottomRight = rect2;
             //Switch topLeft and bottomRight if needed
             if (topLeft.X > bottomRight.X)
             {
-                var temp = topLeft.X;
-                topLeft.X = bottomRight.X;
-                bottomRight.X = temp;
+                (bottomRight.X, topLeft.X) = (topLeft.X, bottomRight.X);
             }
             if (topLeft.Y > bottomRight.Y)
             {
-                var temp = topLeft.Y;
-                topLeft.Y = bottomRight.Y;
-                bottomRight.Y = temp;
+                (bottomRight.Y, topLeft.Y) = (topLeft.Y, bottomRight.Y);
             }
             return topLeft.X < point.X && bottomRight.X > point.X && topLeft.Y < point.Y && bottomRight.Y > point.Y;
         }

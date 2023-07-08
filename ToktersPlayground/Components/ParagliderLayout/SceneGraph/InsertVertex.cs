@@ -58,8 +58,10 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
                     break;
 
                 case InputEventType.MouseDown:
-                    _vertex = new VertexNode();
-                    _vertex.Name = "Vertex " + _layoutNode.Children.Count(n => n is VertexNode);
+                    _vertex = new VertexNode
+                    {
+                        Name = "Vertex " + _layoutNode.Children.Count(n => n is VertexNode)
+                    };
                     _layoutNode.Add(_vertex);
                     _vertex.Selected = true;
                     _vertex.Position = Scene.Camera.ToWorld(inputEvent.MousePos);

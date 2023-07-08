@@ -31,4 +31,10 @@ namespace ToktersPlayground.Controls.SceneGraph
     {
         bool CanBeDragged { get; }
     }
+
+    public interface ISupportSnapping
+    {
+        Vector2 GetGridSnapPoint(Camera camera, Vector2 absPosition);
+        Vector2 GetClosestSnapPoint(Camera camera, Vector2 absPosition);
+    }
 }

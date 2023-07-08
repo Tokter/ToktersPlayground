@@ -12,17 +12,19 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
 {
     public class ParagliderLayoutNode : SceneNode
     {
-        private SKPaint _symmetryPaint;
+        private readonly SKPaint _symmetryPaint;
         public ParagliderLayout? Layout { get; set; }
 
         public ParagliderLayoutNode()
         {
             Name = "Paraglider Layout";
-            _symmetryPaint = new SKPaint();
-            _symmetryPaint.Style = SKPaintStyle.Stroke;
-            _symmetryPaint.Color = SKColors.White;
-            _symmetryPaint.StrokeWidth = 1.0f;
-            _symmetryPaint.IsAntialias = true;
+            _symmetryPaint = new SKPaint
+            {
+                Style = SKPaintStyle.Stroke,
+                Color = SKColors.White,
+                StrokeWidth = 1.0f,
+                IsAntialias = true
+            };
         }
 
         public override void DrawScene(SKCanvas canvas, Camera camera)

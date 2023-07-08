@@ -1,5 +1,4 @@
-﻿using DynamicData;
-using SkiaSharp;
+﻿using SkiaSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +13,8 @@ namespace ToktersPlayground.Controls.SceneGraph
 {
     public class ImageNode : SceneNode, IDraggable, ICanBeLoadedSaved
     {
-        private SKPaint _selectedPaint;
-        private SKPaint _imagePaint;
+        private readonly SKPaint _selectedPaint;
+        private readonly SKPaint _imagePaint;
         private SKBitmap? _bitmap = null;
         private string _fileName = "";
 
@@ -27,12 +26,14 @@ namespace ToktersPlayground.Controls.SceneGraph
 
         public ImageNode()
         {
-            _selectedPaint = new SKPaint();
-            _selectedPaint.Color = SKColors.Blue;
-            _selectedPaint.Style = SKPaintStyle.Stroke;
-            _selectedPaint.StrokeWidth = 1.0f;
-            _selectedPaint.IsAntialias = true;
-            _selectedPaint.TextSize = 10.0f;
+            _selectedPaint = new SKPaint
+            {
+                Color = SKColors.Blue,
+                Style = SKPaintStyle.Stroke,
+                StrokeWidth = 1.0f,
+                IsAntialias = true,
+                TextSize = 10.0f
+            };
 
             _imagePaint = new SKPaint
             {

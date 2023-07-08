@@ -1,16 +1,33 @@
 using Avalonia.Controls;
-using ReactiveUI;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace ToktersPlayground.ViewModels
 {
-    public class ViewModelBase : ReactiveObject, IDisposable
+    public class ViewModelBase : INotifyPropertyChanged, IDisposable
     {
         private bool disposedValue;
 
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         public Control? View { get; set; }
+
+        public void RaiseAndSetIfChanged<T>(ref T backingField, T newValue, [CallerMemberName] string propertyName = "")
+        {
+            if (!EqualityComparer<T>.Default.Equals(backingField, newValue))
+            {
+                backingField = newValue;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        public void RaisePropertyChanged([CallerMemberName] string propertyName = "")
+        {
+              PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         protected virtual void Dispose(bool disposing)
         {

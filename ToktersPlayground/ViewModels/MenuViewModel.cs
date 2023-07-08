@@ -1,13 +1,10 @@
 ﻿using Avalonia.Media;
 using Avalonia.Metadata;
-using Microsoft.VisualBasic;
-using ReactiveUI;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Reactive;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,7 +13,7 @@ namespace ToktersPlayground.ViewModels
 {
     public class MenuViewModel : ViewModelBase
     {
-        private IPlayground _playground;
+        private readonly IPlayground _playground;
         public IPlaygroundCommand? Command { get; set; }
         public IPlayground Playground => _playground;
         public IPlaygroundComponent? Component => _playground.SelectedComponent;

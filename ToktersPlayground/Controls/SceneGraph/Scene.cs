@@ -10,11 +10,11 @@ using ToktersPlayground.Controls.SceneGraph.EditStates;
 
 namespace ToktersPlayground.Controls.SceneGraph
 {
-    public class Scene : IDisposable
+    public class Scene : IDisposable, ISupportSnapping
     {
-        private ScreenCenterCamera _camera;
-        private UICamera _uiCamera;
-        private SceneNode _root;
+        private readonly ScreenCenterCamera _camera;
+        private readonly UICamera _uiCamera;
+        private readonly SceneNode _root;
 
         public Camera Camera => _camera;
         public Camera UICamera => _uiCamera;
@@ -41,9 +41,9 @@ namespace ToktersPlayground.Controls.SceneGraph
 
         private Matrix3x2 _modelTransform = Matrix3x2.Identity;
         private Matrix3x2 _modelInvTransform = Matrix3x2.Identity;
-        private Stack<Matrix3x2> _modelTransforms = new Stack<Matrix3x2>();
-        private Stack<Matrix3x2> _modelInvTransforms = new Stack<Matrix3x2>();
-        private SKPaint _stateText = new SKPaint { Color = SKColors.Orange, TextSize = 16.0f };
+        private readonly Stack<Matrix3x2> _modelTransforms = new();
+        private readonly Stack<Matrix3x2> _modelInvTransforms = new();
+        private readonly SKPaint _stateText = new() { Color = SKColors.Orange, TextSize = 16.0f };
 
         private void ClearModelTransform()
         {
@@ -83,7 +83,7 @@ namespace ToktersPlayground.Controls.SceneGraph
             //Draw in screen space
             canvas.Save();
 
-            UICamera.ApplyModelViewTransformToSurface(canvas, Matrix3x2.Identity, Matrix3x2.Identity);
+            UICamera.ApplyModelViewTransformToSurface(canvas, Matrix3x2.Identity);
             DrawUISceneNode(canvas, Root, Camera);
             if (!string.IsNullOrEmpty(ActiveState?.Description))
             {
@@ -96,7 +96,7 @@ namespace ToktersPlayground.Controls.SceneGraph
         {
             PushModelTransform();
             SetModelTransform(node.GetTransform());
-            camera.ApplyModelViewTransformToSurface(canvas, _modelTransform, _modelInvTransform);
+            camera.ApplyModelViewTransformToSurface(canvas, _modelTransform);
             node.DrawScene(canvas, camera);
             for (int i = 0; i < node.Count; i++)
             {
@@ -127,8 +127,8 @@ namespace ToktersPlayground.Controls.SceneGraph
 
         #region Event Handling
 
-        private List<EditState> _availableStates = new List<EditState>();
-        private Stack<EditState> _activeState = new Stack<EditState>();
+        private readonly List<EditState> _availableStates = new();
+        private readonly Stack<EditState> _activeState = new();
         private StandardCursorType _currentCursor = StandardCursorType.Arrow;
 
         public void RegisterEditState(EditState state)
@@ -221,7 +221,7 @@ namespace ToktersPlayground.Controls.SceneGraph
         public void SetCursor(StandardCursorType cursor)
         {
             _currentCursor = cursor;
-            if (ChangeCursor != null) ChangeCursor(new Cursor(cursor));
+            ChangeCursor?.Invoke(new Cursor(cursor));
         }
 
         #endregion
@@ -243,9 +243,18 @@ namespace ToktersPlayground.Controls.SceneGraph
 
         public void Dispose()
         {
-            foreach(var s in _availableStates)
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
             {
-                if (s is IDisposable d) d.Dispose();
+                foreach (var s in _availableStates)
+                {
+                    if (s is IDisposable d) d.Dispose();
+                }
             }
         }
     }
