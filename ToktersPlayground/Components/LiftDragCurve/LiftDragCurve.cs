@@ -43,7 +43,7 @@ namespace ToktersPlayground.Components.LiftDragCurve
 
         #region ICanBeLoadedSaved
 
-        public void SaveTo(XmlWriter writer)
+        protected override void OnSave(XmlWriter writer, LoadSaveOptions options)
         {
             writer.WriteAttributeString("AngleOfAttackMin", AngleOfAttackMin.ToString());
             writer.WriteAttributeString("AngleOfAttackMax", AngleOfAttackMax.ToString());
@@ -53,7 +53,7 @@ namespace ToktersPlayground.Components.LiftDragCurve
             writer.WriteAttributeString("DragCoefficientMax", DragCoefficientMax.ToString());
         }
 
-        public void LoadFrom(XmlElement element)
+        protected override void OnLoad(XmlElement element, LoadSaveOptions options)
         {
             AngleOfAttackMin = float.Parse(element.GetAttribute("AngleOfAttackMin"));
             AngleOfAttackMax = float.Parse(element.GetAttribute("AngleOfAttackMax"));

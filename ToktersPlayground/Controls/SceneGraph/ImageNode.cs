@@ -113,11 +113,19 @@ namespace ToktersPlayground.Controls.SceneGraph
             }
         }
 
-        protected override void OnSave(XmlWriter writer)
+        protected override void OnSave(XmlWriter writer, LoadSaveOptions options)
         {
-            writer.WriteAttributeString("FileName", _fileName.ToString());
+            writer.WriteAttributeString("FileName", options.GetPathRelativeToBasePath(_fileName));
             writer.WriteAttributeString("Alpha", Alpha.ToString());
             writer.WriteAttributeString("IsLocked", IsLocked.ToString());
+        }
+
+        protected override void OnLoad(XmlElement element, LoadSaveOptions options)
+        {
+            var fileName = options.GetFullPathFromBasePath(element.GetAttribute("FileName"));
+            LoadFromFile(fileName, makeBackgroundTransparent: true);
+            Alpha = byte.Parse(element.GetAttribute("Alpha"));
+            IsLocked = bool.Parse(element.GetAttribute("IsLocked"));
         }
 
     }

@@ -11,14 +11,14 @@ using ToktersPlayground.ViewModels;
 
 namespace ToktersPlayground.Components.ParagliderLayout
 {
-    public class ParagliderLayout : PlaygroundComponent, ICanBeLoadedSaved
+    [PlaygroundComponent("Paraglider Layout")]
+    public class ParagliderLayout : PlaygroundComponent
     {
         public ParagliderLayoutControl? LayoutControl => this.Sketch as ParagliderLayoutControl;
 
         public ParagliderLayout()
         {
             Name = "New Paraglider Layout";
-            Type = "Paraglider Layout";
         }
 
         [Property("Number of Cells")]
@@ -41,29 +41,18 @@ namespace ToktersPlayground.Components.ParagliderLayout
             return new ParagliderLayoutViewModel(this);
         }
 
-        #region ICanBeLoadedSaved
+        #region Loading/Saving
 
-        public void SaveTo(XmlWriter writer)
+        protected override void OnSave(XmlWriter writer, LoadSaveOptions options)
         {
             writer.WriteAttributeString("NumberOfCells", NumberOfCells.ToString());
             writer.WriteAttributeString("FlatSpan", FlatSpan.ToString());
             writer.WriteAttributeString("FlatAspectRatio", FlatAspectRatio.ToString());
             writer.WriteAttributeString("FlatArea", FlatArea.ToString());
             writer.WriteAttributeString("Weight", Weight.ToString());
-
-            if (LayoutControl != null)
-            {
-                foreach (var node in LayoutControl.Scene.Root.Children)
-                {
-                    if (node is ICanBeLoadedSaved loadSave)
-                    {
-                        loadSave.SaveTo(writer);
-                    }
-                }
-            }
         }
 
-        public void LoadFrom(XmlElement element)
+        protected override void OnLoad(XmlElement element, LoadSaveOptions options)
         {
             NumberOfCells = int.Parse(element.GetAttribute("NumberOfCells"));
             FlatSpan = float.Parse(element.GetAttribute("FlatSpan"));

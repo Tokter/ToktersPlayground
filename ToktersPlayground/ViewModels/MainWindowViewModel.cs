@@ -19,6 +19,7 @@ namespace ToktersPlayground.ViewModels
         ObservableCollection<IPlaygroundComponent> Components { get; }
         IPlaygroundComponent? SelectedComponent { get; set; }
         IPlaygroundComponent? CreateComponent(string type);
+        SceneNode? CreateSceneNode(string type);
         string ProjectFileName { get; set; }
         void Clear();
     }
@@ -126,6 +127,20 @@ namespace ToktersPlayground.ViewModels
                 }
             }
             return null;
+        }
+
+        public SceneNode? CreateSceneNode(string typeName)
+        {
+            //Find all types that inherit from SceneNode
+            var sceneNodeType = Assembly.GetExecutingAssembly().GetTypes().FirstOrDefault(t => t.IsSubclassOf(typeof(SceneNode)) && t.Name == typeName);
+            if (sceneNodeType != null)
+            {
+                return Activator.CreateInstance(sceneNodeType) as SceneNode;
+            }
+            else
+            {
+                throw new Exception($"SceneNode type {typeName} not found!");
+            }
         }
 
         public string ProjectFileName { get; set; } = "New.playground";

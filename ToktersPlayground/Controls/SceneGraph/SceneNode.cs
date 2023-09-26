@@ -411,28 +411,53 @@ namespace ToktersPlayground.Controls.SceneGraph
 
         #region ICanBeLoadedSaved
 
-        public void SaveTo(XmlWriter writer)
+        public void SaveTo(XmlWriter writer, LoadSaveOptions options)
         {
             writer.WriteStartElement(Type);
             writer.WriteAttributeString("Name", Name);
             writer.WriteAttributeString("X", Position.X.ToString());
             writer.WriteAttributeString("Y", Position.Y.ToString());
             writer.WriteAttributeString("S", Scale.ToString());
-            OnSave(writer);
+            OnSave(writer, options);
             foreach (var child in Children)
             {
-                child.SaveTo(writer);
+                child.SaveTo(writer, options);
             }
             writer.WriteEndElement();
         }
 
-        protected virtual void OnSave(XmlWriter writer)
+        protected virtual void OnSave(XmlWriter writer, LoadSaveOptions options)
         {
         }
 
-        public void LoadFrom(XmlElement element)
+        public void LoadFrom(XmlElement element, LoadSaveOptions options)
         {
-            throw new NotImplementedException();
+            Name = element.GetAttribute("Name");
+            Position = new Vector2(float.Parse(element.GetAttribute("X")), float.Parse(element.GetAttribute("Y")));
+            Scale = float.Parse(element.GetAttribute("S"));
+            OnLoad(element, options);
+            foreach (XmlElement node in element.ChildNodes)
+            {
+                var sceneNode = Children.FirstOrDefault(n => n.Type == node.Name && n.Name == node.GetAttribute("Name"));
+                if (sceneNode == null) //We need to create a new node
+                {
+                    sceneNode = options.Playground.CreateSceneNode(node.Name);
+                    if (sceneNode != null)
+                    {
+                        this.Add(sceneNode);
+                    }
+                    else throw new Exception($"Could not create node of type {node.Name}!");
+                }
+                if (sceneNode is ICanBeLoadedSaved loadSave)
+                {
+                    loadSave.LoadFrom(node, options);
+                }
+                else throw new Exception($"Node {node.Name} does not implement ICanBeLoadedSaved!");
+            }
+        }
+
+        protected virtual void OnLoad(XmlElement element, LoadSaveOptions options)
+        {
         }
 
         #endregion

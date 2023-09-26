@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ToktersPlayground Version="1.0.0.1">
+  <Component Name="777 Knight" Type="Paraglider Layout" NumberOfCells="51" FlatSpan="12.7" FlatAspectRatio="5.4" FlatArea="29.8" Weight="5.6">
+    <SimpleGrid Name="Grid" X="0" Y="0" S="1" />
+    <ParagliderLayoutNode Name="Paraglider Layout" X="0" Y="0" S="1">
+      <ImageNode Name="Background Image" X="6.699182" Y="-4.426262" S="0.539" FileName="777Knight.PNG" Alpha="128" IsLocked="True" />
+      <VertexNode Name="a1" X="-43.28585" Y="-118.54247" S="1" VertexType="AttachmentPoint" IsOnPerimeter="False" />
+    </ParagliderLayoutNode>
+  </Component>
+</ToktersPlayground>

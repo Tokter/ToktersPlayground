@@ -24,6 +24,8 @@ namespace ToktersPlayground
                 NewLineChars = "\r\n"
             };
 
+            var options = new LoadSaveOptions(playground);
+
             using (var xmlWriter = XmlWriter.Create(playground.ProjectFileName, settings))
             {
                 xmlWriter.WriteStartDocument();
@@ -35,11 +37,7 @@ namespace ToktersPlayground
                 {
                     if (component is ICanBeLoadedSaved ls)
                     {
-                        xmlWriter.WriteStartElement("Component");
-                        xmlWriter.WriteAttributeString("Name", component.Name);
-                        xmlWriter.WriteAttributeString("Type", component.Type);
-                        ls.SaveTo(xmlWriter);
-                        xmlWriter.WriteEndElement();
+                        ls.SaveTo(xmlWriter, options);
                     }
                 }
 
@@ -50,6 +48,8 @@ namespace ToktersPlayground
 
         public static void LoadProject(IPlayground playground)
         {
+            var options = new LoadSaveOptions(playground);
+
             playground.Clear();
             var doc = new XmlDocument();
             doc.Load(playground.ProjectFileName);
@@ -59,12 +59,11 @@ namespace ToktersPlayground
                 {
                     if (componentNode.Name == "Component")
                     {
-                        var name = componentNode.GetAttribute("Name");
                         var type = componentNode.GetAttribute("Type");
                         var component = playground.CreateComponent(type);
                         if (component is ICanBeLoadedSaved ls)
                         {
-                            ls.LoadFrom(componentNode);
+                            ls.LoadFrom(componentNode, options);
                         }
                     }
                 }

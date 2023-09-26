@@ -9,12 +9,12 @@ using ToktersPlayground.ViewModels;
 
 namespace ToktersPlayground.Components.ParagliderWingSimulation
 {
+    [PlaygroundComponent("Wing Simulation")]
     public class ParagliderWingSimulation : PlaygroundComponent
     {
         public ParagliderWingSimulation()
         {
             Name = "Paraglider Wing Simulation";
-            Type = "New Simulation";
         }
 
         protected override ViewModelBase CreateViewModel()

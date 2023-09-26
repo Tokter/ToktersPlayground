@@ -6,6 +6,7 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using ToktersPlayground.Controls.SceneGraph;
 
 namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
@@ -92,5 +93,17 @@ namespace ToktersPlayground.Components.ParagliderLayout.SceneGraph
         }
 
         public bool InRect(Vector2 rect1, Vector2 rect2) => IsInRect(Vector2.Zero, ToLocal(rect1), ToLocal(rect2));
+
+        protected override void OnSave(XmlWriter writer, LoadSaveOptions options)
+        {
+            writer.WriteAttributeString("VertexType", VertexType.ToString());
+            writer.WriteAttributeString("IsOnPerimeter", IsOnPerimeter.ToString());
+        }
+
+        protected override void OnLoad(XmlElement element, LoadSaveOptions options)
+        {
+            VertexType = (VertexType)Enum.Parse(typeof(VertexType), element.GetAttribute("VertexType"));
+            IsOnPerimeter = bool.Parse(element.GetAttribute("IsOnPerimeter"));
+        }
     }
 }
